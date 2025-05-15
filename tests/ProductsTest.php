@@ -56,7 +56,7 @@ use DisciteDB\DisciteDB;
 
         // $items_result_all = $database->users->all();
         $items_result_all = $database->table('gfis_admn_images')->create(['image_token'=>bin2hex(random_bytes(64)),'image_lien'=>3,'image_document'=>'2025-05-13']);
-
+ 
         echo '<pre>',var_dump($items_result_all->fetchArray()),'</pre>';
         // echo '<pre>',var_dump($database->gfis_admn_mouvements->all()->fetchArray()),'</pre>';
 
