@@ -33,8 +33,6 @@ class QueryExpression
     public function __construct(QueryOperator $queryOperator, array $arguments)
     {
         $this->queryOperator = $queryOperator;
-
-        
         
         match ($this->queryOperator) {
             QueryOperator::Contains, QueryOperator::NotContains,QueryOperator::NotLike,QueryOperator::Like => $this->containsOperatorArgs($arguments),
@@ -43,26 +41,51 @@ class QueryExpression
 
     }
     
-    public function returnSQL(string $key, mysqli $connection) : ?string
+    public function returnCondition(string $key, mysqli $connection) : ?string
     {
         $this->connection = $connection;
 
         return match ($this->queryOperator)
         {
-            QueryOperator::Or => (new HandlerOr($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::Contains => (new HandlerContains($key,$this->arguments,$this->queryLocation,$this->connection))->toSql(),
-            QueryOperator::Like => (new HandlerLike($key,$this->arguments,$this->queryLocation,$this->connection))->toSql(),
-            QueryOperator::NotLike => (new HandlerNotLike($key,$this->arguments,$this->queryLocation,$this->connection))->toSql(),
-            QueryOperator::Between => (new HandlerBetween($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::Not => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toSql() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::NotIn => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toSql() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::NotContains => (new HandlerNotContains($key,$this->arguments,$this->queryLocation,$this->connection))->toSql(),
-            QueryOperator::NotBetween => (new HandlerNotBetween($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::MoreThan => (new HandlerMoreThan($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::LessThan => (new HandlerLessThan($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::MoreOrEqual => (new HandlerMoreOrEqual($key,$this->arguments,$this->connection))->toSql(),
-            QueryOperator::LessOrEqual => (new HandlerLessOrEqual($key,$this->arguments,$this->connection))->toSql(),
-            default => (new HandlerEqual($key,$this->arguments,$this->connection))->toSql(),
+            QueryOperator::Or => (new HandlerOr($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::Contains => (new HandlerContains($key,$this->arguments,$this->queryLocation,$this->connection))->toCondition(),
+            QueryOperator::Like => (new HandlerLike($key,$this->arguments,$this->queryLocation,$this->connection))->toCondition(),
+            QueryOperator::NotLike => (new HandlerNotLike($key,$this->arguments,$this->queryLocation,$this->connection))->toCondition(),
+            QueryOperator::Between => (new HandlerBetween($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::Not => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toCondition() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::NotIn => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toCondition() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::NotContains => (new HandlerNotContains($key,$this->arguments,$this->queryLocation,$this->connection))->toCondition(),
+            QueryOperator::NotBetween => (new HandlerNotBetween($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::MoreThan => (new HandlerMoreThan($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::LessThan => (new HandlerLessThan($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::MoreOrEqual => (new HandlerMoreOrEqual($key,$this->arguments,$this->connection))->toCondition(),
+            QueryOperator::LessOrEqual => (new HandlerLessOrEqual($key,$this->arguments,$this->connection))->toCondition(),
+            default => (new HandlerEqual($key,$this->arguments,$this->connection))->toCondition(),
+        };
+    }
+    
+    public function returnValue(mysqli $connection) : ?string
+    {
+        $this->connection = $connection;
+
+        $key = '';
+
+        return match ($this->queryOperator)
+        {
+            QueryOperator::Or => (new HandlerOr($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::Contains => (new HandlerContains($key,$this->arguments,$this->queryLocation,$this->connection))->toValue(),
+            QueryOperator::Like => (new HandlerLike($key,$this->arguments,$this->queryLocation,$this->connection))->toValue(),
+            QueryOperator::NotLike => (new HandlerNotLike($key,$this->arguments,$this->queryLocation,$this->connection))->toValue(),
+            QueryOperator::Between => (new HandlerBetween($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::Not => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toValue() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::NotIn => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toValue() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::NotContains => (new HandlerNotContains($key,$this->arguments,$this->queryLocation,$this->connection))->toValue(),
+            QueryOperator::NotBetween => (new HandlerNotBetween($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::MoreThan => (new HandlerMoreThan($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::LessThan => (new HandlerLessThan($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::MoreOrEqual => (new HandlerMoreOrEqual($key,$this->arguments,$this->connection))->toValue(),
+            QueryOperator::LessOrEqual => (new HandlerLessOrEqual($key,$this->arguments,$this->connection))->toValue(),
+            default => (new HandlerEqual($key,$this->arguments,$this->connection))->toValue(),
         };
     }
 

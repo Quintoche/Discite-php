@@ -59,18 +59,5 @@ enum TypeBinary : int
      * Default blob file.
      */
     case File = 545;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

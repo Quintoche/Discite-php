@@ -3,17 +3,22 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
-use DisciteDB\Config\Enums\QueryStructure;
-use DisciteDB\Core\QueryManager;
+use DisciteDB\QueryHandler\QueryResult;
 
 trait Update
 {
-    public function update(string|int|array $uuid, array $args)
+    public function update(string|int|array $uuid, array $args) : QueryResult
     {
         foreach($args as $argKey => $argValue)
         {
             $key = $this->returnKey($argKey);
             
+            if(is_null($key))
+            {
+                unset($args[$argKey]);
+                continue;
+            }
+
             if(!$key->validateField(Operators::Update,$argValue))
             {
                 unset($args[$argKey]);
@@ -22,17 +27,7 @@ trait Update
             
             $args[$argKey] = $key->generateField();
         }
-        
-        
-        foreach($this->getMap() ?? [] as $keyName => $keyClass)
-        {
-            if(!array_key_exists($keyName,$args))
-            {
-                $keyClass->validateField(Operators::Update,null);
-                $args[$keyName] = $keyClass->generateField();
-            }
-        }
-
+    
         if(is_array($uuid))
         {
             $uuidKey = array_keys($uuid)[0];
@@ -40,10 +35,11 @@ trait Update
         }
         else
         {
-            $uuidKey = $this->getIndexKey()->getName();
+            $uuidKey = $this->getIndexKey()->getName() ?? 'id';
             $uuidValue = $uuid;
         }
 
+        
         $this->query->setOperator(Operators::Update);
         $this->query->setArgs($args);
         $this->query->setUuid([$uuidKey => $uuidValue]);

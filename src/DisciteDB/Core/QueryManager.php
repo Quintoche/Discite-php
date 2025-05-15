@@ -16,11 +16,11 @@ class QueryManager
     
     protected Operators $operator;
 
-    protected QueryHandler $query;
+    protected QueryHandler $queryHandler;
 
-    protected QueryBuilder $build;
+    protected QueryBuilder $queryBuilder;
 
-    protected QueryResult $result;
+    protected QueryResult $queryResult;
 
     protected array $args;
 
@@ -48,7 +48,7 @@ class QueryManager
     {
         $this->operator = $operator;
     }
-    public function setArgs(array $args) : void
+    public function setArgs(?array $args) : void
     {
         $this->args = $args ?? [];
     }
@@ -77,39 +77,47 @@ class QueryManager
     {
         return $this->uuid;
     }
+
+    public function getQueryHandler() : ?QueryHandler
+    {
+        return $this->queryHandler;
+    }
+
+    public function getQueryBuilder() : ?QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
+
+    public function getQueryResult() : ?QueryResult
+    {
+        return $this->queryResult;
+    }
     
-    public function makeQuery() : array
+    public function makeQuery() : QueryResult
     {   
-        $this->query = $this->buildHandler();
+        $this->buildHandler();
 
-        $this->build = $this->buildQuery();
+        $this->buildQuery();
 
-        $this->result = $this->buildResult($this->build, $this->getConnection(), $this->getOperator());
+        $this->buildResult();
 
-        return $this->result->createResult();
+        return $this->queryResult;
     }    
 
-    private function buildHandler() : QueryHandler
+    private function buildHandler() : void
     {
-        return new QueryHandler($this);
+        $this->queryHandler =  new QueryHandler($this);
     }
 
-    private function buildQuery() : QueryBuilder
+    private function buildQuery() : void
     {
-        return new QueryBuilder($this->query);
+        $this->queryBuilder = new QueryBuilder($this);
     }
 
-    private function buildResult(QueryBuilder $query, mysqli $connection, Operators $operator)
+    private function buildResult() : void
     {
-        return new QueryResult($query, $connection, $operator);
+        $this->queryResult = new QueryResult($this);
     }
-
-
-    // QueryBuilder => Create Patern ;
-    // QueryStructure => Regroup QueryArguments // QueryJoin
-    // QueryArguments => create array with every arguments based on patern ;
-    // QueryJoin => Check for foreign key ;
-    // 
 }
 
 ?>

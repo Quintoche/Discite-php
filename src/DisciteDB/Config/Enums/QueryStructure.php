@@ -24,7 +24,7 @@ enum QueryStructure : int
      * Select query structure used in back code for QueryBuilder.
      * Don't not try to update or modify theses values.
     */
-    case Select = 610;
+    case Base = 610;
 
 
     /** 
@@ -33,7 +33,7 @@ enum QueryStructure : int
      * Select Specific operator used in back code to retrieve query Operators.
      * Don't not try to update or modify theses values.
     */
-    case SelectSpecific = 611;
+    case Structure = 611;
 
 
     /** 
@@ -42,7 +42,7 @@ enum QueryStructure : int
      * Select All operator used in back code to retrieve query Operators.
      * Don't not try to update or modify theses values.
     */
-    case SelectAll = 612;
+    case Methods = 612;
 
     /** 
      * __Update__
@@ -50,7 +50,7 @@ enum QueryStructure : int
      * Update query structure used in back code for QueryBuilder.
      * Don't not try to update or modify theses values.
     */
-    case Update = 613;
+    case Datas = 613;
 
     /** 
      * __Insert__
@@ -58,68 +58,6 @@ enum QueryStructure : int
      * Insert query structure used in back code for QueryBuilder.
      * Don't not try to update or modify theses values.
     */
-    case Insert = 614;
-
-
-    /** 
-     * __Delete__
-     * 
-     * Delete query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case Delete = 615;
-
-    /** 
-     * __CreateTable__
-     * 
-     * Create Table query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case CreateTable = 616;
-
-    /** 
-     * __CreateKey__
-     * 
-     * Create Key query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case CreateKey = 617;
-
-    /** 
-     * __CreateKey__
-     * 
-     * Create Key query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case DeleteKey = 618;
-
-    /** 
-     * __CreateKey__
-     * 
-     * Create Key query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case UpdateKey = 619;
-
-    /** 
-     * __Join__
-     * 
-     * Join query structure used in back code for QueryBuilder.
-     * Don't not try to update or modify theses values.
-    */
-    case Join = 6110;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
+    case Conditions = 614;
 }
 ?>

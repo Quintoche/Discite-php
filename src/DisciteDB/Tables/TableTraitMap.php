@@ -1,6 +1,7 @@
 <?php
 namespace DisciteDB\tables;
 
+use DisciteDB\Config\Enums\KeyUsage;
 use DisciteDB\Keys\BaseKey;
 
 trait TableTraitMap
@@ -17,7 +18,14 @@ trait TableTraitMap
 
     public function returnKey(string $keyName) : ?BaseKey
     {
-        return $this->map[$keyName] ?? null;
+        if($this->database->config()->getKeyusage() === KeyUsage::LooseUsage)
+        {
+            return $this->database->keys()->create($keyName, ['alias' => $keyName,'looseUsage'=>true]);
+        }
+        else
+        {
+            return $this->map[$keyName] ?? null;
+        }
     }
 }
 

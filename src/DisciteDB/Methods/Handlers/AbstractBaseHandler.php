@@ -38,6 +38,25 @@ abstract class AbstractBaseHandler
         return $this->formatForm();
     }
 
+    public function toCondition(): string
+    {
+        $this->key = $this->escapeKey();
+        $this->value = $this->escapeValue();
+        $this->parts = $this->formatStructure();
+
+        return $this->formatForm();
+    }
+
+    public function toValue(): string
+    {
+        $this->key = '';
+        $this->templateUnique = '{VALUE}';
+        $this->value = $this->escapeValue();
+        $this->parts = $this->formatStructure();
+
+        return $this->formatForm();
+    }
+
     protected function escapeKey() : string
     {
         return DataKey::escape($this->key,$this->connection);

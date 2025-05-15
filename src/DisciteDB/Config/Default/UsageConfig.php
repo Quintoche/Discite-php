@@ -4,6 +4,7 @@ namespace DisciteDB\Config\Default;
 
 use DisciteDB\Config\Enums\TableUsage;
 use DisciteDB\Config\Enums\KeyUsage;
+use DisciteDB\DisciteDB;
 
 class UsageConfig
 {
@@ -15,7 +16,7 @@ class UsageConfig
      *
      * @var TableUsage Default : StrictUsage
      */
-    public static TableUsage $TABLE_USAGE = TableUsage::StrictUsage;
+    public static TableUsage $TABLE_USAGE = DisciteDB::TABLE_USAGE_STRICT;
     
     /**
      * Default value defined for key usage
@@ -24,7 +25,7 @@ class UsageConfig
      *
      * @var KeyUsage Default : StrictUsage
      */
-    public static KeyUsage $KEY_USAGE = KeyUsage::StrictUsage;
+    public static KeyUsage $KEY_USAGE = DisciteDB::KEY_USAGE_STRICT;
     
 }
 

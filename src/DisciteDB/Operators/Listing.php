@@ -3,15 +3,12 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
-use DisciteDB\Config\Enums\QueryStructure;
-use DisciteDB\Core\QueryManager;
+use DisciteDB\QueryHandler\QueryResult;
 
 trait Listing
 {
-    public function listing(array $args)
+    public function listing(array $args) : QueryResult
     {
-        
-
         foreach($args as $argKey => $argValue)
         {
             $key = $this->returnKey($argKey);
@@ -22,12 +19,6 @@ trait Listing
                 continue;
             }
             if(!$key->validateField(Operators::Listing,$argValue))
-            {
-                unset($args[$argKey]);
-                continue;
-            }
-
-            if(!array_key_exists($argKey,$this->getMap() ?? []))
             {
                 unset($args[$argKey]);
                 continue;

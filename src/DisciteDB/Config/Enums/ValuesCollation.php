@@ -11,21 +11,28 @@ namespace DisciteDB\Config\Enums;
  *
  * @enum
  */
-enum KeyUsage : int 
+enum ValuesCollation : int 
 {
     /** 
-     * __Strict usage__
+     * __Utf8mb4_general_ci__
      * 
-     * Keys have to be defined before used.
+     * Utf8mb4_general_ci
     */
-    case StrictUsage = 201;
+    case Utf8mb4_general_ci = 401;
 
     /** 
-     * __Loose usage__
+     * __Utf8mb4_unicode_ci__
      * 
-     * Keys shouldn't be defined before used.
-     * e.g : $db->table->create(['undefinedKey'=>$value]);
+     * Utf8mb4_unicode_ci
     */
-    case LooseUsage = 202;
+    case Utf8mb4_unicode_ci = 402;
+
+    /** 
+     * __Utf8mb4_bin__
+     * 
+     * Utf8mb4_bin
+    */
+    case Utf8mb4_bin = 404;
+
 }
 ?>

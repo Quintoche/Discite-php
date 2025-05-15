@@ -109,17 +109,12 @@ enum Operators : int
     */
     case Average = 5810;
 
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
+    /** 
+     * __CountAll__
+     * 
+     * CountAll operator used in back code to retrieve operators.
+     * Don't not try to update or modify theses values.
+    */
+    case CountAll = 5811;
 }
 ?>

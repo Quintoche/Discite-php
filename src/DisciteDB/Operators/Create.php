@@ -3,14 +3,15 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\QueryHandler\QueryResult;
 
 trait Create
 {
-    public function create(array $args)
+    public function create(array $args) : QueryResult
     {
         foreach($args as $argKey => $argValue)
         {
-            $key = $this->tableManager->returnKey($argKey);
+            $key = $this->returnKey($argKey);
             
             if(!$key->validateField(Operators::Create,$argValue))
             {
@@ -30,6 +31,11 @@ trait Create
                 $args[$keyName] = $keyClass->generateField();
             }
         }
+
+        $this->query->setOperator(Operators::Create);
+        $this->query->setArgs($args);
+
+        return $this->query->makeQuery();
 
     }
 }

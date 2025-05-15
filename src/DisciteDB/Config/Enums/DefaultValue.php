@@ -59,18 +59,5 @@ enum DefaultValue : int
      * Now (alias for CURRENT_TIMESTAMP for consistency) 
     */
     case Now = 575;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

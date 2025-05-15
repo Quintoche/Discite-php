@@ -93,17 +93,5 @@ enum TypeString : int
      * Password string format.
      */
     case Password = 519;
-
-
-    public static function getValue(string|self $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

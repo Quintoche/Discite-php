@@ -108,18 +108,5 @@ enum QueryTemplate : int
      * Don't not try to update or modify theses values.
     */
     case Join = 6310;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

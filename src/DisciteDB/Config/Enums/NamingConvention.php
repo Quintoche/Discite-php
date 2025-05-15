@@ -10,6 +10,7 @@ namespace DisciteDB\Config\Enums;
  * - PascalCase: Words are not separated. Each word starts with an uppercase letter.
  * - SnakeCase: Words are separated by underscores. All words are lowercase.
  * - SnakeUpperCase: Words are separated by underscores. All words are uppercase.
+ * - Undefined: Words will not be formated.
  *
  * @enum
  */
@@ -43,17 +44,11 @@ enum NamingConvention : int
     */
     case SnakeUpperCase = 304;
 
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
+    /** 
+     * __Undefined__
+     * 
+     * Words will not be formated.
+    */
+    case Undefined = 305;
 }
 ?>

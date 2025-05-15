@@ -2,11 +2,28 @@
 
 namespace DisciteDB\Operators;
 
+use DisciteDB\Config\Enums\Operators;
+use DisciteDB\QueryHandler\QueryResult;
+
+/**
+ * Récupère toutes les entrées de la table.
+ *
+ * @return QueryResult
+ */
 trait All
 {
-    public function all()
+
+    /**
+     * Récupère toutes les entrées de la table.
+     *
+     * @return QueryResult
+     */
+    public function all() : QueryResult
     {
-        
+        $this->query->setOperator(Operators::All);
+        $this->query->setArgs([]);
+
+        return $this->query->makeQuery();
     }
 }
 

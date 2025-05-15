@@ -2,11 +2,12 @@
 
 namespace DisciteDB\QueryHandler\Handler;
 
+use DisciteDB\Config\Default\QueryStructureConfig;
 use DisciteDB\Config\Default\QueryTemplateConfig;
 use DisciteDB\Config\Default\QueryTypeConfig;
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Config\Enums\QueryStructure;
 use DisciteDB\Config\Enums\QueryTemplate;
-use DisciteDB\Config\Enums\QueryType;
 
 class HandlerTemplate
 {
@@ -43,7 +44,7 @@ class HandlerTemplate
     private function selectTemplate() : QueryTemplate
     {
         return match ($this->operator) {
-            Operators::All => QueryTemplate::SelectAll,
+            Operators::All, Operators::CountAll => QueryTemplate::SelectAll,
             Operators::Compare => QueryTemplate::Select,
             Operators::Count => QueryTemplate::Select,
             Operators::Create => QueryTemplate::Insert,
@@ -58,6 +59,7 @@ class HandlerTemplate
     private function createTemplate() : void
     {
         $this->queryTemplate = $this->selectTemplate();
+        
         foreach($this->retrieveTemplate() as $data)
         {
             $this->{'template'.ucfirst($data->name)} = $this->{'getTemplate'.ucfirst($data->name)}();
@@ -70,6 +72,7 @@ class HandlerTemplate
         $this->templateArray['Methods'] = $this->templateMethods;
         $this->templateArray['Datas'] = $this->templateDatas;
         $this->templateArray['Conditions'] = $this->templateConditions;
+        
     }
 
     private function retrieveTemplate() : ?array
@@ -78,23 +81,23 @@ class HandlerTemplate
     }
     private function getTemplateBase() : ?string
     {
-        return QueryTypeConfig::$MAP[QueryType::Base->name][$this->queryTemplate->name] ?? null;
+        return QueryStructureConfig::$MAP[QueryStructure::Base->name][$this->queryTemplate->name] ?? null;
     }
     private function getTemplateStructure() : ?string
     {
-        return QueryTypeConfig::$MAP[QueryType::Structure->name][$this->queryTemplate->name] ?? null;
+        return QueryStructureConfig::$MAP[QueryStructure::Structure->name][$this->queryTemplate->name] ?? null;
     }
     private function getTemplateDatas() : ?string
     {
-        return QueryTypeConfig::$MAP[QueryType::Datas->name][$this->queryTemplate->name] ?? null;
+        return QueryStructureConfig::$MAP[QueryStructure::Datas->name][$this->queryTemplate->name] ?? null;
     }
     private function getTemplateMethods() : ?string
     {
-        return QueryTypeConfig::$MAP[QueryType::Methods->name][$this->queryTemplate->name] ?? null;
+        return QueryStructureConfig::$MAP[QueryStructure::Methods->name][$this->queryTemplate->name] ?? null;
     }
     private function getTemplateConditions() : ?string
     {
-        return QueryTypeConfig::$MAP[QueryType::Conditions->name][$this->queryTemplate->name] ?? null;
+        return QueryStructureConfig::$MAP[QueryStructure::Conditions->name][$this->queryTemplate->name] ?? null;
     }
 }
 

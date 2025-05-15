@@ -68,18 +68,5 @@ enum TypeInteger : int
      * Unix time, Alternative to TypeDate::Timestamp.
      */
     case UnixTime = 506;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

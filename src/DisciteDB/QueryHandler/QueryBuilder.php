@@ -2,10 +2,13 @@
 
 namespace DisciteDB\QueryHandler;
 
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryExpression;
 
 class QueryBuilder
 {
+    protected QueryManager $queryManager;
+
     protected QueryHandler $queryHandler;
 
     protected string $query;
@@ -18,9 +21,11 @@ class QueryBuilder
 
     protected ?array $_uuid;
 
-    public function __construct(QueryHandler $queryHandler)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->queryHandler = $queryHandler;
+        $this->queryManager = $queryManager;
+
+        $this->queryHandler = $this->queryManager->getQueryHandler();
 
         $this->associateTemplate();
 
@@ -33,15 +38,6 @@ class QueryBuilder
         $this->query = $this->searchReplace($this->query,$this->associateUuid());
 
         return $this->query;
-    }
-
-    public function getUuid() : array
-    {
-        return $this->queryHandler->returnUuid();
-    }
-    public function getTable() : ?string
-    {
-        return $this->queryHandler->returnStructure()['TABLE'] ?? null;
     }
 
     private function associateTemplate() : void

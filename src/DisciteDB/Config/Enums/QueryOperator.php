@@ -129,18 +129,5 @@ enum QueryOperator : int
      * Don't not try to update or modify theses values.
     */
     case NotIn = 5913;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

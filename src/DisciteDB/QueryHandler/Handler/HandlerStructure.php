@@ -67,7 +67,7 @@ class HandlerStructure
     private function getStructureColumns() : string
     {
         return match ($this->operator) {
-            Operators::Count => 'COUNT(*)',
+            Operators::Count, Operators::CountAll => 'COUNT(*)',
             Operators::Sum => 'SUM({COLUMN})',
             Operators::Average => 'AVG({COLUMN})',
             default => '*',

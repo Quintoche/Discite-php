@@ -58,18 +58,5 @@ enum IndexType : int
      * Spatial index (for geometry types) 
     */
     case Spatial = 565;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

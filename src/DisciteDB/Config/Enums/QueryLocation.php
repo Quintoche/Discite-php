@@ -11,7 +11,6 @@ namespace DisciteDB\Config\Enums;
  * - StartWith : StartWith operator.
  * - EndWith : EndWith operator.
  * - Between : Between operator.
- * - Not : Not operator.
  * 
  * @enum
  */
@@ -34,21 +33,8 @@ enum QueryLocation : int
     /** 
      * __Between__
      * 
-     * EndWith operator used in to change query to look for a value wich is in middle of searched value.
+     * Between operator used in to change query to look for a value which is in middle of searched value.
     */
     case Between = 602;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

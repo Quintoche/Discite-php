@@ -2,50 +2,13 @@
 
 namespace DisciteDB\Config\Default;
 
+use DisciteDB\Config\Enums\QueryStructure;
 use DisciteDB\Config\Enums\QueryType;
 use DisciteDB\Config\Enums\QueryTemplate;
 
 class QueryTypeConfig
 {
-    
-    public static array $MAP = 
-    [
-        QueryType::Base->name  => [
-            QueryTemplate::Select->name => 'SELECT',
-            QueryTemplate::SelectAll->name => 'SELECT',
-            QueryTemplate::Update->name => 'UPDATE',
-            QueryTemplate::Insert->name => 'INSERT INTO',
-            QueryTemplate::Delete->name => 'DELETE',
-        ],        
-        QueryType::Structure->name  => [
-            QueryTemplate::Select->name => '{COLUMNS} FROM {DATABASE}.{TABLE}',
-            QueryTemplate::SelectAll->name => '{COLUMNS} FROM {DATABASE}.{TABLE}',
-            QueryTemplate::Update->name => '{DATABASE}.{TABLE}',
-            QueryTemplate::Insert->name => '{DATABASE}.{TABLE}',
-            QueryTemplate::Delete->name => '{DATABASE}.{TABLE}',
-        ],        
-        QueryType::Methods->name  => [
-            QueryTemplate::Select->name => 'LEFT JOIN {TABLE_FOREIGN} ON {TABLE}.{INDEX_KEY} = {TABLE_FOREIGN}.{FOREIGN_PRIMARY_KEY}',
-            QueryTemplate::SelectAll->name => null,
-            QueryTemplate::Update->name => null,
-            QueryTemplate::Insert->name => null,
-            QueryTemplate::Delete->name => null,
-        ],        
-        QueryType::Datas->name  => [
-            QueryTemplate::Select->name => null,
-            QueryTemplate::SelectAll->name => null,
-            QueryTemplate::Update->name => 'SET {CONDITIONS}',
-            QueryTemplate::Insert->name => '({KEYS}) VALUES ({VALUES})',
-            QueryTemplate::Delete->name => null,
-        ],        
-        QueryType::Conditions->name  => [
-            QueryTemplate::Select->name => 'WHERE {CONDITIONS}',
-            QueryTemplate::SelectAll->name => null,
-            QueryTemplate::Update->name => 'WHERE {UUID}',
-            QueryTemplate::Insert->name => null,
-            QueryTemplate::Delete->name => 'WHERE {UUID}',
-        ],        
-    ];
+     
 
 }
 

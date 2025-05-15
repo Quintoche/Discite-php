@@ -73,13 +73,13 @@ class HandlerArgument
     {
         return DataKey::escape($key, $this->connection);
     }
-    private function createArgsValues(mixed $value) : QueryExpression
+    private function createArgsValues(mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value : new QueryExpression(QueryOperator::Equal,[$value]);
+        return ($value instanceof QueryExpression) ? $value->returnValue($this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnValue($this->connection);
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value->returnSQL($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnSQL($key, $this->connection);
+        return ($value instanceof QueryExpression) ? $value->returnCondition($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
     }
 }
 

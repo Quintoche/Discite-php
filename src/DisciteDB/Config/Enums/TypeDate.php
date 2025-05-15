@@ -51,18 +51,5 @@ enum TypeDate : int
      * Year only (YYYY).
      */
     case Year = 524;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

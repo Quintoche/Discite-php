@@ -3,76 +3,94 @@
 namespace DisciteDB\QueryHandler;
 
 use DisciteDB\Config\Enums\Operators;
-use DisciteDB\QueryHandler\Result\Result;
-use mysqli;
+use DisciteDB\Core\QueryManager;
+use DisciteDB\QueryHandler\Result\ResultData;
+use DisciteDB\QueryHandler\Result\ResultInformations;
 
 class QueryResult
 {
-    protected QueryBuilder $queryBuilder;
+    private QueryManager $queryManager;
 
-    protected mysqli $connection;
+    private ?ResultData $result = null;
 
-    protected Operators $operator;
 
-    protected Result $result;
-
-    protected ?string $table;
-
-    protected array $uuid;
-    
-    public function __construct(QueryBuilder $queryBuilder, mysqli $connection, Operators $operator)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->queryBuilder = $queryBuilder;
-        $this->connection = $connection;
-        $this->operator = $operator;
-        $this->uuid = $this->queryBuilder->getUuid() ?? null;
-        $this->table = $this->queryBuilder->getTable() ?? null;
+        $this->queryManager = $queryManager;
+        $this->result = $this->performResult();
 
-        $this->performResult();
-
+        $this->handleOtherResult();
     }
 
-    public function createResult() : array
+    private function performResult() : ResultData
     {
-        return [
-            'data'=>$this->handleData(),
-            'info'=>$this->handleInformations(),
-        ];
+        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator());
     }
 
-    private function handleData() : array
+    private function handleOtherResult()
     {
-        return (!isset($this->result->getResult()['need_previous_data'])) ? $this->result->getResult() : $this->performNew() ;
-    }
-    private function handleInformations() : array
-    {
-        return match(true)
-        {
-            $this->result->getResultError()['text'] != null && $this->result->getResultError()['code'] != null => ['status'=>'error','error'=>['text'=>$this->result->getResultError()['text'],'code'=>$this->result->getResultError()['code']],'time'=>time()],
-            isset($this->result->getResult()['need_previous_data']) => ['status'=>'success','operator'=>$this->operator->name,'table'=>$this->table,'time'=>time()],
-            default => ['status'=>'success','operator'=>$this->operator->name,'table'=>$this->table,'rows'=>sizeof($this->result->getResult()),'time'=>time()],
+        match ($this->queryManager->getOperator()) {
+            Operators::Create => $this->result->handleNewResult(mysqli_insert_id($this->queryManager->getConnection()) ?? null, $this->queryManager->getTable()),
+            Operators::Update => $this->result->handleNewResult($this->queryManager->getUuid(), $this->queryManager->getTable()),
+            default => null,
         };
     }
 
-    private function performResult()
+
+
+
+
+
+
+    public function fetch() : array
     {
-        return $this->result = new Result($this->queryBuilder->createBuild(),$this->connection, $this->operator);
+        return $this->result->getResult() ?? $this->result->getResultAll() ?? [];
     }
-    private function performNew()
+
+    public function fetchAll() : array
     {
-        $_uuid = [];
-        switch($this->result->getResult()['need_previous_data'])
-        {
-            case true :
-                $_uuid = $this->uuid;
-                break;
-            default :
-                $_uuid = ['id'=>$this->result->getResult()['need_previous_data']];
-                break;
+        return $this->result->getResult() ?? $this->result->getResultAll() ?? [];
+    }
+
+    public function fetchNext()
+    {
+        return ['data'=>$this->result->getResult() ?? $this->result->getResultNext(), 'info' => $this->fetchInformations()] ?? [];
+    }
+    
+    public function fetchGenerator(): \Generator
+    {
+        if (!$this->result) {
+            return;
         }
 
-        return (new Result("SELECT * FROM `{$this->table}` WHERE `".array_keys($_uuid)[0]."` = '".$_uuid[0]."'",$this->connection, Operators::Retrieve))->getResult();
+        while ($row = $this->result->getResultNext()) {
+            yield $row;
+        }
     }
+
+    public function fetchArray() : array
+    {
+        return [
+            'data' => $this->result->getResult() ?? $this->result->getResultAll() ?? [],
+            'info' => $this->fetchInformations(),
+        ];
+    }
+
+    public function fetchInformations() : array
+    {
+        return [
+            'status' => ResultInformations::handleQueryStatus($this->result),
+            'time' => ResultInformations::handleTimeArray(),
+            'query' => ResultInformations::handleQueryArray($this->queryManager, $this->result),
+            'error' => ResultInformations::handleQueryErrors($this->result),
+        ];
+    }
+
+    public function count() : int
+    {
+        return $this->result->getResulRows() ?? 0;
+    }
+
 }
 
 ?>

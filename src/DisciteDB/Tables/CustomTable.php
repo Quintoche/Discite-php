@@ -12,7 +12,12 @@ use DisciteDB\Operators\Listing;
 use DisciteDB\Operators\Retrieve;
 use DisciteDB\Operators\Update;
 
-final class CustomTable extends BaseTable
+/**
+ * Récupère dynamiquement une table de la base.
+ *
+ * @method all \DisciteDB\Operators\All
+ */
+final class CustomTable extends BaseTable implements TableInterface
 {
     use All;
     use Compare;

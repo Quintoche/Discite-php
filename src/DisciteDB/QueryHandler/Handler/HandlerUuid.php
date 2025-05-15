@@ -67,7 +67,7 @@ class HandlerUuid
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value->returnSQL($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnSQL($key, $this->connection);
+        return ($value instanceof QueryExpression) ? $value->returnCondition($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
     }
 }
 

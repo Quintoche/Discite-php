@@ -1,7 +1,7 @@
 <?php
 namespace DisciteDB\Core;
 
-use DisciteDB\Configuration;
+use DisciteDB\Database;
 
 /**
  * __WIP__
@@ -11,11 +11,11 @@ use DisciteDB\Configuration;
  */
 class UsersManager
 {
-    private Configuration $configuration;
+    protected Database $database;
     
-    public function __construct(Configuration $configuration)
+    public function __construct(Database $database)
     {
-        $this->configuration = $configuration;
+        $this->database = $database;
     }
 }
 

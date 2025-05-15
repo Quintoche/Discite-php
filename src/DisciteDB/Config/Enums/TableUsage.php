@@ -27,18 +27,5 @@ enum TableUsage : int
      * e.g : $db->undefinedTable->create([]);
     */
     case LooseUsage = 102;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

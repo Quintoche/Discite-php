@@ -35,18 +35,5 @@ enum TypeFloat : int
      * Fixed-point number with high precision (useful for currency).
      */
     case Decimal = 532;
-
-
-
-    public static function getValue(string $value) : int
-    {
-        foreach(self::cases() as $status)
-        {
-            if( $value === $status->name ){
-                return $status->value;
-            }
-        }
-        return 0;
-    }
 }
 ?>

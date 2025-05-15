@@ -3,6 +3,7 @@
 namespace DisciteDB\Config\Default;
 
 use DisciteDB\Config\Enums\NamingConvention;
+use DisciteDB\DisciteDB;
 
 class NamingConfig
 {
@@ -12,9 +13,9 @@ class NamingConfig
      *
      * You can override this value at runtime.
      *
-     * @var NamingConvention
+     * @var \DisciteDB\Config\Enums\NamingConvention NamingConvention
      */
-    public static NamingConvention $NAMING_CASE = NamingConvention::CamelCase;
+    public static NamingConvention $NAMING_CASE = DisciteDB::NAMING_CONVENTION_UNDEFINED;
     
 }
 

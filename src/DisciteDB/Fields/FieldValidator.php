@@ -45,6 +45,8 @@ class FieldValidator
 
     private function validateIni(mixed $value) : bool
     {
+        if($this->isLooseUsage()) return true;
+
         $lookedValue = ($value instanceof QueryExpression) ? $value->returnArgs() : $value;
 
         if(is_array($lookedValue))
@@ -88,6 +90,11 @@ class FieldValidator
     private function validateFormat(mixed $lookedValue) : bool
     {
         return (new ManageFormat($this->key, $lookedValue))->checking();
+    }
+
+    private function isLooseUsage() : bool
+    {
+        return $this->key->getLooseUsage();
     }
 }
 ?>

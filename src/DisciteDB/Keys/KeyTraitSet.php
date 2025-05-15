@@ -63,6 +63,11 @@ trait KeyTraitSet
         $this->updatable = $updatable;
     }
 
+    public function setLooseUsage(bool $looseUsage) : void
+    {
+        $this->looseUsage = $looseUsage;
+    }
+
     public function setMagicValue(string $key, mixed $value) : void
     {
         if(property_exists($this, $key))

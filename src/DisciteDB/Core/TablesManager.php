@@ -78,7 +78,13 @@ class TablesManager
 
     }
 
-    public function getTable(string $name) : BaseTable
+    /**
+     * Récupère une instance de table à partir de son nom ou alias.
+     *
+     * @param string $name Nom ou alias de la table
+     * @return CustomTable
+     */
+    public function getTable(string $name) : CustomTable
     {
         return $this->returnClassInMap($name);
     }

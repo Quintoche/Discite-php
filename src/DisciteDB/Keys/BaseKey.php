@@ -13,6 +13,18 @@ use DisciteDB\Database;
 use DisciteDB\Fields\FieldValidator;
 use DisciteDB\Tables\BaseTable;
 
+/**
+ * Key.
+ * 
+ * This is the key class 
+ * 
+ * @method string|null getName() return Key name
+ * @method string|null getAlias() return Key Alias
+ * @method string|null getPrefix() return Key Prefix
+ * @method TypeString|TypeDate|TypeFloat|TypeInteger|TypeBinary|null getType() return Key type
+ *
+ * @return BaseKey \DisciteDB\Keys\BaseKey
+ */
 abstract class BaseKey
 {
     use KeyTraitGet, KeyTraitSet, KeyTraitMap;
@@ -42,6 +54,8 @@ abstract class BaseKey
     protected bool $secure = false;
 
     protected bool $updatable = true;
+
+    protected bool $looseUsage = false;
 
     protected array $map;
 
