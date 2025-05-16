@@ -47,6 +47,11 @@ class QueryResult
         return $this->result->getResult() ?? $this->result->getResultAll() ?? [];
     }
 
+    public function fetchQuery() : string
+    {
+        return $this->result->getQuery() ?? '';
+    }
+
     public function fetchAll() : array
     {
         return $this->result->getResult() ?? $this->result->getResultAll() ?? [];

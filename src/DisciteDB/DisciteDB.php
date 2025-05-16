@@ -9,6 +9,7 @@ use DisciteDB\Config\Enums\DefaultValue;
 use DisciteDB\Config\Enums\IndexType;
 use DisciteDB\Config\Enums\KeyUsage;
 use DisciteDB\Config\Enums\QueryLocation;
+use DisciteDB\Config\Enums\QuerySort;
 use DisciteDB\Config\Enums\TypeBinary;
 use DisciteDB\Config\Enums\TypeDate;
 use DisciteDB\Config\Enums\TypeFloat;
@@ -170,6 +171,37 @@ class DisciteDB
      * @var KeyUsage
      */
     public const KEY_USAGE_LOOSE = KeyUsage::LooseUsage;
+
+
+
+    /* === Sorting method === */
+
+
+    /**
+     * No Query sort.
+     * No sorting will be used in query. 
+     *
+     * @var QuerySort
+     */
+    public const SORT_NO_SORT = QuerySort::NoSort;
+
+
+    /**
+     * DESC Query sort.
+     * Sort query descendently.
+     *
+     * @var QuerySort
+     */
+    public const SORT_DESC = QuerySort::Desc;
+
+
+    /**
+     * ASC Query sort.
+     * Sort query ascendently.
+     *
+     * @var QuerySort
+     */
+    public const SORT_ASC = QuerySort::Asc;
 
 
 
@@ -487,7 +519,7 @@ class DisciteDB
     public const TYPE_INTEGER_UNIXTIME = TypeInteger::UnixTime;
 
 
-    
+
     /* === String Types === */
 
 

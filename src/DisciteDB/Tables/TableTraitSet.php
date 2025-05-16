@@ -1,6 +1,7 @@
 <?php
 namespace DisciteDB\Tables;
 
+use DisciteDB\Config\Enums\QuerySort;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Utilities\NameSanitizer;
 
@@ -25,6 +26,11 @@ trait TableTraitSet
     public function setIndexKey(BaseKey|null $key) : void
     {
         $this->indexKey = $key ?? null;
+    }
+
+    public function setSort(QuerySort $sort) : void
+    {
+        $this->sort = $sort ?? null;
     }
 
     public function setMagicValue(string $key, mixed $value) : void

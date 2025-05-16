@@ -33,6 +33,14 @@ abstract class AbstractLocateHandler
         $this->connection = $connection;
     }
 
+    public function toSql(): string
+    {
+        $this->key = $this->escapeKey();
+        $this->value = $this->escapeValue();
+        $this->parts = $this->formatStructure();
+
+        return $this->formatForm();
+    }
 
     public function toCondition(): string
     {

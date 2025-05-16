@@ -149,6 +149,14 @@ class ResultData
     /**
      * Retourne les données finales du résultat.
      */
+    public function getQuery(): string
+    {
+        return $this->query ?? null;
+    }
+    
+    /**
+     * Retourne les données finales du résultat.
+     */
     public function getResultAll(): array
     {
         return mysqli_fetch_all($this->rawResult, MYSQLI_ASSOC);

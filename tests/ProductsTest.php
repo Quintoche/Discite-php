@@ -1,7 +1,9 @@
 <?php
 
 use DisciteDB\Config\Enums\KeyUsage;
+use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
+use DisciteDB\Methods\QueryMethod;
 
     ini_set('display_errors','1');
     ini_set('display_startup_erros','1');
@@ -17,7 +19,7 @@ use DisciteDB\DisciteDB;
         $database->config()->setKeyusage(KeyUsage::LooseUsage);
 
 
-
+        $database->tables()->add('test');
 
     // $user = new \disciteDB\Core\UsersManager();
 
@@ -105,7 +107,7 @@ use DisciteDB\DisciteDB;
 // echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
 // echo "[Quintoche] Moyenne : " . average($libTimes) . " ms\n<br/>";
 
-        // $database->accounter->update(['id'=>3],['token'=>'test','datecreated'=>'2024-09-22']);
+        $database->accounter->update(['id'=>3],['token'=>QueryMethod::Contains('discite',QueryLocation::Between),'datecreated'=>'2024-09-22']);
         // print_r(($database->gfis_admn_mouvements->all())->fetchArray());
     // $database->config()->tables->loadExistingTables();
 

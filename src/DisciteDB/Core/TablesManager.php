@@ -1,6 +1,7 @@
 <?php
 namespace DisciteDB\Core;
 
+use DisciteDB\Config\Traits\TablesManager\Create;
 use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Tables\BaseTable;
@@ -8,6 +9,8 @@ use DisciteDB\Tables\CustomTable;
 
 class TablesManager
 {
+    use Create;
+
     private Database $database;
 
     protected array $map = [];
@@ -15,22 +18,6 @@ class TablesManager
     public function __construct(Database $database)
     {
         $this->database = $database;
-    }
-
-    public function create(string $tableName, ?array $parms = []) : BaseTable
-    {
-        $class = new CustomTable($this->database);
-        
-        $class->setMagicValue('name',$tableName);
-        foreach($parms as $k => $v)
-        {
-            $class->setMagicValue($k,$v);
-        }
-
-        $tableAlias = $parms['alias'] ?? $tableName;
-        $class->setMagicValue('alias',$tableAlias);
-        $this->registerTable($tableAlias,$class);
-        return $class;
     }
 
     public function update(string $tableName, ?array $parms = []) : void
@@ -53,17 +40,24 @@ class TablesManager
         unset($class);
     }
 
-    public function appendKey(string $tableName, BaseKey ...$keys) : void
+    public function appendKey(string $tableName, BaseKey|string ...$keys) : void
     {
         $class = $this->returnClassInMap($tableName);
         
         foreach($keys as $key)
         {
-            $class->appendKey($key);
+            if($key instanceof BaseKey)
+            {
+                $class->appendKey($key);
+            }
+            else
+            {
+                if($this->database->keys()->$key) $class->appendKey($this->database->keys()->$key);
+            }
         }
     }
 
-    public function revokeKey(string $tableName, BaseKey ...$keys) : void
+    public function revokeKey(string $tableName, BaseKey|string ...$keys) : void
     {
         $class = $this->returnClassInMap($tableName);
 

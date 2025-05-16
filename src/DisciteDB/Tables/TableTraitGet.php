@@ -2,6 +2,7 @@
 namespace DisciteDB\Tables;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Config\Enums\QuerySort;
 use DisciteDB\Keys\BaseKey;
 
 trait TableTraitGet
@@ -24,6 +25,11 @@ trait TableTraitGet
     public function getIndexKey() : BaseKey|null
     {
         return $this->indexKey ?? null;
+    }
+
+    public function getSort() : QuerySort|null
+    {
+        return $this->sort ?? null;
     }
 
     public function getMap() : array|null

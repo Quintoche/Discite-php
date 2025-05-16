@@ -2,11 +2,13 @@
 
 namespace DisciteDB\Operators;
 
+use DisciteDB\QueryHandler\QueryResult;
+
 trait Compare
 {
-    public function compare()
+    public function compare() : QueryResult
     {
-        
+        return $this->query;
     }
 }
 
