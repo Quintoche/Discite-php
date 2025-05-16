@@ -2,6 +2,14 @@
 
 Discite-PHP is a lightweight and extensible query builder for PHP using MySQLi. It provides an expressive, object-oriented API to manage SQL operations easily.
 
+Discite-PHP helps manipulate, format, correct, and secure SQL queries based on the MySQL manager. The library uses MySQLi.
+
+Several operating modes are available to best suit each use case. The library requires minimal initialization to reduce overhead.
+
+Only the connection must be initialized outside the library for security reasons.
+
+---
+
 ## Features
 
 - Object-oriented and fluent interface  
@@ -12,13 +20,50 @@ Discite-PHP is a lightweight and extensible query builder for PHP using MySQLi. 
 - Field (key) declarations with type, index, nullable, default  
 - Built-in query modifiers and logical operators  
 
+---
+
+## Summary
+
+- [Installation](#installation)  
+- [General Functionality](#general-functionality)  
+- [Configuration](#configuration)  
+  - [Accessing Configuration](#accessing-the-configuration-interface)  
+  - [Access to Configuration Constants](#access-to-configuration-variables)  
+  - [Charset](#charset)  
+    - [Available Charsets](#available-charsets)  
+  - [Collation](#collation)  
+    - [Available Collations](#available-collations)  
+  - [Naming Convention](#naming-convention)  
+    - [Available Naming Conventions](#available-naming-conventions)  
+- [Usage Modes](#usage-modes)  
+  - [Table Usage](#table-usage)  
+    - [Available Table Usage Modes](#available-table-usage-modes)  
+  - [Key Usage](#key-usage)  
+    - [Available Key Usage Modes](#available-key-usage-modes)  
+- [Future](#future)  
+- [Keys (Columns)](#keys-columns)  
+  - [Parameters](#parameters)  
+  - [Creating Keys](#creating-keys)  
+- [Key Types](#key-types)  
+- [Key Index Types](#key-index-types)  
+- [Default Key Values](#default-key-values)  
+- [Query Methods](#Query-Methods)
+- [Fetching Results](#Fetching-Results)
+- [Project Structure](#Project-Structure)
+- [License](#License)
+
+--
+
 ## Installation
 
-Install via Composer:
+Install with Composer:
 
 ```bash
-composer require discite/discite-php
+composer require dscite/discite-php
 ```
+
+---
+
 
 ## Usage Example
 
@@ -63,99 +108,6 @@ var_dump($queryFakeItems->fetchAll());
 
 echo '<b>ALL DATA AND INFORMATIONS</b>';
 var_dump($queryFakeItems->fetchArray());
-```
-
-## Configuration
-
-### Access
-
-- `$disciteDB->configuration();` — Full configuration
-- `$disciteDB->config();` — Shortcut alias
-- `$disciteDB->conf();` — Shortcut alias
-
-### Charset and Collation
-
-```php
-$disciteDB->configuration()->setCharset(DisciteDB::CHARSET_UTF8);
-$disciteDB->config()->setCollation(DisciteDB::COLLATION_UTF8_GENERAL_CI);
-```
-
-### Table Usage Modes
-
-
-
-```php
-$disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
-```
-
-### Key Usage Modes
-
-
-
-```php
-$disciteDB->conf()->setKeyUsage(DisciteDB::KEY_USAGE_STRICT);
-```
-
-## Query Methods
-
-```php
-QueryMethod::Equals('value');
-QueryMethod::Not('value');
-QueryMethod::Contains('value', QueryLocation::Between);
-QueryMethod::StartsWith('value');
-QueryMethod::EndsWith('value');
-QueryMethod::MoreThan(10);
-QueryMethod::LessOrEqual(100);
-QueryMethod::Between(10, 20);
-QueryMethod::In(['val1', 'val2']);
-QueryMethod::NotIn(['val3', 'val4']);
-QueryMethod::IsNull();
-QueryMethod::IsNotNull();
-```
-
-### QueryLocation Constants
-
-```php
-QueryLocation::Before;
-QueryLocation::After;
-QueryLocation::Between;
-```
-
-## Fetching Results
-
-| Method               | Description                          |
-|----------------------|--------------------------------------|
-| `fetchQuery()`       | Returns SQL string only              |
-| `fetchInformations()`| Meta-information (types, keys, etc.)|
-| `fetchNext()`        | Gets the next row                    |
-| `fetchAll()`         | Gets all matching rows               |
-| `fetchArray()`       | Gets all rows and schema info        |
-
-## Project Structure
-
-- `src/` – Core library files  
-- `example/` – Usage demonstrations  
-- `tests/` – PHPUnit testing  
-
-## License
-
-MIT License — see `LICENSE` file.
-# Discite-PHP
-
-DisciteDB helps manipulate, format, correct, and secure SQL queries based on the MySQL manager. The library uses MySQLi.
-
-Several operating modes are available to best suit each use case. The library requires minimal initialization to reduce overhead.
-
-Only the connection must be initialized outside the library for security reasons.
-
----
-
-## Installation
-
-Install with Composer:
-
-```bash
-composer require dscite/discite-php
 ```
 
 ---
@@ -240,8 +192,6 @@ $disciteDB->config()->getCharset();
   <tbody>
     <tr><td>CHARSET_UTF8</td><td>utf8</td><td></td></tr>
     <tr><td>CHARSET_UTF8MB4</td><td>utf8mb4</td><td>✓</td></tr>
-    <tr><td>CHARSET_UTF8MB3</td><td>utf8mb3</td><td></td></tr>
-    <tr><td>CHARSET_LATIN1</td><td>latin1</td><td></td></tr>
   </tbody>
 </table>
 
@@ -411,3 +361,50 @@ WIP - documentation
 ## Tables
 
 WIP - documentation
+
+--- 
+
+
+## Query Methods
+
+Theses methods, used in `listing` and `count`, will auto-format (even in loose usage mode) query based on parameters you give.
+
+```php
+QueryMethod::Equals('value');
+QueryMethod::Not('value');
+QueryMethod::Contains('value', QueryLocation::Between);
+QueryMethod::StartsWith('value');
+QueryMethod::EndsWith('value');
+QueryMethod::MoreThan(10);
+QueryMethod::LessOrEqual(100);
+QueryMethod::Between(10, 20);
+QueryMethod::In(['val1', 'val2']);
+QueryMethod::NotIn(['val3', 'val4']);
+QueryMethod::IsNull();
+QueryMethod::IsNotNull();
+```
+
+---
+
+## Fetching Results
+
+| Method               | Description                          |
+|----------------------|--------------------------------------|
+| `fetchQuery()`       | Returns SQL string only              |
+| `fetchInformations()`| Meta-information (types, keys, etc.)|
+| `fetchNext()`        | Gets the next row                    |
+| `fetchAll()`         | Gets all matching rows               |
+| `fetchArray()`       | Gets all rows and schema info        |
+
+
+--- 
+
+## Project Structure
+
+- `src/` – Core library files  
+- `example/` – Usage demonstrations  
+- `tests/` – PHPUnit testing  
+
+## License
+
+MIT License — see `LICENSE` file.
