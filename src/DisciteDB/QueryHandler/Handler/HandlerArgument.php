@@ -4,6 +4,7 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Config\Enums\QueryOperator;
+use DisciteDB\Methods\QueryClause;
 use DisciteDB\Methods\QueryExpression;
 use DisciteDB\Sql\Data\DataKey;
 use mysqli;
@@ -26,7 +27,7 @@ class HandlerArgument
 
     public function __construct(array $args, Operators $operator ,mysqli $connection)
     {
-        $this->args = $args;
+        $this->args = $this->escapeArgs($args);
         $this->connection = $connection;
         $this->operator = $operator;
 
@@ -36,6 +37,19 @@ class HandlerArgument
     public function retrieve() : array
     {
         return $this->argumentArray;
+    }
+
+    private function escapeArgs(mixed $args) : ?array
+    {
+        $_array = [];
+
+        foreach($args as $k => $v)
+        {
+            if($v instanceof QueryClause) continue;
+            $_array[$k] = $v;
+        }
+
+        return $_array;
     }
 
     private function createArgs()

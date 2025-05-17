@@ -4,6 +4,7 @@ namespace DisciteDB\Utilities;
 
 use DisciteDB\Config\Default\NamingConfig;
 use DisciteDB\Config\Enums\NamingConvention;
+use DisciteDB\DisciteDB;
 
 /**
  * __Utilities class to sanitize string name__.
@@ -38,6 +39,8 @@ class NameSanitizer
      */ 
     public static function sanitize(string $string, ?NamingConvention $naming = null): string
     {
+        if(NamingConfig::$NAMING_CASE == DisciteDB::NAMING_CONVENTION_UNDEFINED) return $string;
+        
         $naming ??= NamingConfig::$NAMING_CASE;
 
         return match ($naming) {

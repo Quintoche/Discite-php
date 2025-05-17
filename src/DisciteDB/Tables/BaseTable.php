@@ -2,11 +2,12 @@
 
 namespace DisciteDB\Tables;
 
+use DisciteDB\Config\Enums\QuerySort;
 use DisciteDB\Database;
 use DisciteDB\Connection;
 
 use DisciteDB\Core\QueryManager;
-
+use DisciteDB\DisciteDB;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Keys\KeyTemplates\TemplateId;
 
@@ -100,9 +101,9 @@ abstract class BaseTable implements TableInterface
      *
      * Usually 'DESC' or 'ASC'. Used when retrieving collections.
      *
-     * @var string|null
+     * @var QuerySort|null
      */
-    protected ?string $sort = 'DESC';
+    protected ?QuerySort $sort = DisciteDB::SORT_NO_SORT;
 
 
     /**

@@ -2,14 +2,19 @@
 namespace DisciteDB\Core;
 
 use DisciteDB\Config\Traits\TablesManager\Create;
+use DisciteDB\Config\Traits\TablesManager\Delete;
+use DisciteDB\Config\Traits\TablesManager\Update;
 use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Tables\BaseTable;
 use DisciteDB\Tables\CustomTable;
+use DisciteDB\Utilities\NameSanitizer;
 
 class TablesManager
 {
     use Create;
+    use Update;
+    use Delete;
 
     private Database $database;
 
@@ -18,26 +23,6 @@ class TablesManager
     public function __construct(Database $database)
     {
         $this->database = $database;
-    }
-
-    public function update(string $tableName, ?array $parms = []) : void
-    {
-        $class = $this->returnClassInMap($tableName);
-
-        foreach($parms as $k => $v)
-        {
-            $class->setMagicValue($k,$v);
-        }
-
-        $tableAlias = $class->getAlias() ?? $parms['alias'] ?? $tableName;
-        
-        $this->registerTable($tableAlias,$class);
-    }   
-
-    public function delete(string $tableName) : void
-    {
-        $class = $this->returnClassInMap($tableName);
-        unset($class);
     }
 
     public function appendKey(string $tableName, BaseKey|string ...$keys) : void
@@ -99,6 +84,14 @@ class TablesManager
 
         return $table;
             
+    }
+
+    public function __get($name) : BaseTable
+    {
+        $table = $this->map[$name] ?? $this->map[NameSanitizer::sanitize($name)] ?? null;
+        if(!$table) throw new \Exception("Table '$name' not found");
+
+        return $table;
     }
 }
 

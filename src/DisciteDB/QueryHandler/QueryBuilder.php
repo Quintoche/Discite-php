@@ -34,7 +34,7 @@ class QueryBuilder
     public function createBuild() : string
     {
         $this->query = $this->searchReplace($this->query,$this->queryHandler->returnStructure());
-        $this->query = $this->searchReplace($this->query,array_merge($this->associateKeys(),$this->associateValues(),$this->associateArgs()));
+        $this->query = $this->searchReplace($this->query,array_merge($this->associateKeys(),$this->associateValues(),$this->associateArgs(),$this->associateModifier()));
         $this->query = $this->searchReplace($this->query,$this->associateUuid());
 
         return $this->query;
@@ -108,6 +108,20 @@ class QueryBuilder
         }
 
         return ['VALUES'=>implode(', ',$_array)];
+    }
+
+    private function associateModifier() : array
+    {
+        if(!$this->queryHandler->returnModifier()['MODIFIER']) return ['MODIFIER'=>''];
+        
+        $_array = [];
+        foreach($this->queryHandler->returnModifier()['MODIFIER'] as $data)
+        {
+            if(is_null($data)) continue;
+            $_array[] = $data;
+        }
+
+        return ['MODIFIER'=>implode(' ',$_array)];
     }
 
     private function searchReplace(string $haystack, array|string $needle) : string

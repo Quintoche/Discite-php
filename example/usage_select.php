@@ -3,6 +3,7 @@
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
 use DisciteDB\Methods\QueryMethod;
+use DisciteDB\Methods\QueryModifier;
 
 ini_set('display_errors','1');
 ini_set('display_startup_erros','1');
@@ -37,6 +38,7 @@ error_reporting(E_ALL);
         'name'=>QueryMethod::Not('White Widget'),
         'description'=>QueryMethod::Contains('and',QueryLocation::Between),
         'price' => QueryMethod::LessOrEqual(25),
+        QueryModifier::order(DisciteDB::SORT_DESC,'named')
     ]);
 
     // After that, you can show values :

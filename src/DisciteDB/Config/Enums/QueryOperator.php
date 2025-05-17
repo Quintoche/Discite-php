@@ -129,5 +129,21 @@ enum QueryOperator : int
      * Don't not try to update or modify theses values.
     */
     case NotIn = 5913;
+
+    /** 
+     * __Sort__
+     * 
+     * Sort operator used in back code to retrieve query Operators.
+     * Don't not try to update or modify theses values.
+    */
+    case Sort = 5914;
+
+    /** 
+     * __Limit__
+     * 
+     * Limit operator used in back code to retrieve query Operators.
+     * Don't not try to update or modify theses values.
+    */
+    case Limit = 5915;
 }
 ?>

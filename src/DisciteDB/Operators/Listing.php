@@ -3,6 +3,7 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Methods\QueryClause;
 use DisciteDB\QueryHandler\QueryResult;
 
 trait Listing
@@ -11,13 +12,17 @@ trait Listing
     {
         foreach($args as $argKey => $argValue)
         {
+            if($argValue instanceof QueryClause) continue;
+            
             $key = $this->returnKey($argKey);
             
+
             if(is_null($key))
             {
                 unset($args[$argKey]);
                 continue;
             }
+
             if(!$key->validateField(Operators::Listing,$argValue))
             {
                 unset($args[$argKey]);

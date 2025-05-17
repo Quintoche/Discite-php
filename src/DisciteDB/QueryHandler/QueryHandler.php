@@ -4,6 +4,7 @@ namespace DisciteDB\QueryHandler;
 
 use DisciteDB\Core\QueryManager;
 use DisciteDB\QueryHandler\Handler\HandlerArgument;
+use DisciteDB\QueryHandler\Handler\HandlerModifier;
 use DisciteDB\QueryHandler\Handler\HandlerStructure;
 use DisciteDB\QueryHandler\Handler\HandlerTemplate;
 use DisciteDB\QueryHandler\Handler\HandlerUuid;
@@ -18,6 +19,8 @@ class QueryHandler
 
     protected HandlerArgument $handlerArguments;
 
+    protected HandlerModifier $handlerModifier;
+
     protected ?HandlerUuid $handlerUuid;
 
     public function __construct(QueryManager $queryManager)
@@ -27,6 +30,7 @@ class QueryHandler
         $this->handleTemplate();
         $this->handleStructure();
         $this->handleArguments();
+        $this->handleModifier();
         $this->handleUuid();
     }
 
@@ -50,19 +54,28 @@ class QueryHandler
         return $this->handlerUuid->retrieve();
     }
 
-    private function handleUuid()
+    public function returnModifier() : array
+    {
+        return $this->handlerModifier->retrieve();
+    }
+
+    private function handleUuid() : void
     {
         if($this->queryManager->getUuid() === null) return;
         $this->handlerUuid = new HandlerUuid($this->queryManager->getUuid(),$this->queryManager->getConnection());
     }
 
-    private function handleArguments()
+    private function handleArguments() : void
     {
         $this->handlerArguments = new HandlerArgument($this->queryManager->getArgs(),$this->queryManager->getOperator(),$this->queryManager->getConnection());
     }
     private function handleMethods()
     {
 
+    }
+    private function handleModifier() : void
+    {
+        $this->handlerModifier = new HandlerModifier($this->queryManager->getArgs(), $this->queryManager->getConnection());
     }
     private function handleStructure() : void
     {

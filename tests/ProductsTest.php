@@ -13,13 +13,13 @@ use DisciteDB\Methods\QueryMethod;
 
 
         $connection = mysqli_connect('localhost','root','','gfis_boutique');
-        $database = new \DisciteDB\Database($connection);
+        // $database = new \DisciteDB\Database($connection);
 
-        $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
-        $database->config()->setKeyusage(KeyUsage::LooseUsage);
+        // $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
+        // $database->config()->setKeyusage(KeyUsage::LooseUsage);
 
 
-        $database->tables()->add('test');
+        // $database->tables()->add('test');
 
     // $user = new \disciteDB\Core\UsersManager();
 
@@ -57,57 +57,114 @@ use DisciteDB\Methods\QueryMethod;
         // echo '<pre>', var_dump($items_result->fetchNext()), '</pre>';
 
         // $items_result_all = $database->users->all();
-        $items_result_all = $database->table('gfis_admn_images')->create(['image_token'=>bin2hex(random_bytes(64)),'image_lien'=>3,'image_document'=>'2025-05-13']);
+        // $items_result_all = $database->table('gfis_admn_images')->create(['image_token'=>bin2hex(random_bytes(64)),'image_lien'=>3,'image_document'=>'2025-05-13']);
  
-        echo '<pre>',var_dump($items_result_all->fetchArray()),'</pre>';
+        // echo '<pre>',var_dump($items_result_all->fetchArray()),'</pre>';
         // echo '<pre>',var_dump($database->gfis_admn_mouvements->all()->fetchArray()),'</pre>';
 
 // if ($connection->connect_error) {
 //     die('Erreur mysqli : ' . $connection->connect_error);
 // }
 
-// // Connexion via ta librairie
-// $database = new \DisciteDB\Database($connection);
+// Connexion via ta librairie
+$database = new \DisciteDB\Database($connection);
 
-// $tableName = 'gfis_admn_mouvements';
-// $iterations = 500;
+$database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
+    $database->config()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
+    $database->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
-// // Utils
-// function ms(float $start, float $end): float {
-//     return round(($end - $start) * 1000, 4); // millisecondes
-// }
+$tableName = 'gfis_admn_mouvements';
+$iterations = 500;
 
-// function average(array $values): float {
-//     return round(array_sum($values) / count($values), 4);
-// }
+// Utils
+function ms(float $start, float $end): float {
+    return round(($end - $start) * 1000, 4); // millisecondes
+}
 
-// // Benchmark mysqli brut
-// $rawTimes = [];
+function average(array $values): float {
+    return round(array_sum($values) / count($values), 4);
+}
 
-// for ($i = 0; $i < $iterations; $i++) {
-//     $start = microtime(true);
-//     $result = $connection->query("SELECT * FROM `$tableName` ORDER BY `mouvement_id` DESC");
-//     $data = $result->fetch_all(MYSQLI_ASSOC);
-//     $end = microtime(true);
-//     $rawTimes[] = ms($start, $end);
-// }
+// Benchmark mysqli brut
+$rawTimes = [];
 
-// // Benchmark DisciteDB
-// $libTimes = [];
+for ($i = 0; $i < $iterations; $i++) {
+    $start = microtime(true);
+    $result = $connection->query("SELECT * FROM `$tableName`");
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+    $end = microtime(true);
+    $rawTimes[] = ms($start, $end);
+}
 
-// for ($i = 0; $i < $iterations; $i++) {
-//     $start = microtime(true);
-//     $data = $database->table($tableName)->all()->fetchArray(); // ou $db->$tableName->all();
-//     $end = microtime(true);
-//     $libTimes[] = ms($start, $end);
-// }
+// Benchmark DisciteDB
+$libTimes = [];
 
-// // Résultat
-// echo "=== Résultats après $iterations itérations ===\n\n<br/>";
-// echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
-// echo "[Quintoche] Moyenne : " . average($libTimes) . " ms\n<br/>";
+for ($i = 0; $i < $iterations; $i++) {
+    $start = microtime(true);
+    $data = $database->table($tableName)->all()->fetchArray(); // ou $db->$tableName->all();
+    $end = microtime(true);
+    $libTimes[] = ms($start, $end);
+}
 
-        $database->accounter->update(['id'=>3],['token'=>QueryMethod::Contains('discite',QueryLocation::Between),'datecreated'=>'2024-09-22']);
+// Résultat
+echo "=== Résultats après $iterations itérations ===\n\n<br/>";
+echo "=== LOOSE MODE ===\n\n<br/>";
+echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
+echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
+
+
+
+echo '<br/><br/><br/><br/>';
+
+$database->config()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
+    $database->config()->setKeyusage(DisciteDB::KEY_USAGE_STRICT);
+
+    $database->tables()->add($tableName,$tableName);
+
+    $key_mvt_id = $database->keys()->create('mouvement_id',['type'=>DisciteDB::TYPE_INTEGER_BIGINT]);
+
+    $database->tables()->appendKey($tableName,$key_mvt_id);
+
+
+// Benchmark mysqli brut
+$rawTimes = [];
+
+for ($i = 0; $i < $iterations; $i++) {
+    $start = microtime(true);
+
+    $result = $connection->query("SELECT * FROM `$tableName` WHERE `mouvement_id` != 9999 ");
+    $data = $result->fetch_all(MYSQLI_ASSOC);
+
+    
+    $end = microtime(true);
+    $rawTimes[] = ms($start, $end);
+}
+
+// Benchmark DisciteDB
+$libTimes = [];
+
+for ($i = 0; $i < $iterations; $i++) {
+    $start = microtime(true);
+
+
+    $data = $database->table($tableName)->listing(
+        ['mouvement_id'=>QueryMethod::Not(9999)]
+        )->fetchArray(); // ou $db->$tableName->all();
+
+
+
+    $end = microtime(true);
+    $libTimes[] = ms($start, $end);
+}
+
+
+// Résultat
+echo "=== Résultats après $iterations itérations ===\n\n<br/>";
+echo "=== STRICT MODE ===\n\n<br/>";
+echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
+echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
+
+        // $database->accounter->update(['id'=>3],['token'=>QueryMethod::Contains('discite',QueryLocation::Between),'datecreated'=>'2024-09-22']);
         // print_r(($database->gfis_admn_mouvements->all())->fetchArray());
     // $database->config()->tables->loadExistingTables();
 

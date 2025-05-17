@@ -50,7 +50,14 @@ class ResultData
      */
     private function executeQuery() : void
     {
-        $this->rawResult = @mysqli_query($this->connection, $this->query);
+        try 
+        {
+            $this->rawResult = @mysqli_query($this->connection, $this->query);
+        } 
+        catch (\Exception $e) 
+        {
+            $this->rawResult = false;
+        }
     }
 
     /**
@@ -132,6 +139,7 @@ class ResultData
     private function handleError(): void
     {
         $this->resultData = [];
+        $this->resultRows = 0;
         $this->errorText = mysqli_error($this->connection);
         $this->errorCode = mysqli_errno($this->connection);
     }
