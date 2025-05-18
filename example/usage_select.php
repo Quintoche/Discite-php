@@ -29,7 +29,7 @@ error_reporting(E_ALL);
 
     // To show how to make "SELECT" query, I've prefere to make loose usage for 
     // both table and keys.
-    $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
+    $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
     $disciteDB->conf()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
 
 
