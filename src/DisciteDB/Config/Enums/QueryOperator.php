@@ -145,5 +145,13 @@ enum QueryOperator : int
      * Don't not try to update or modify theses values.
     */
     case Limit = 5915;
+
+    /** 
+     * __Async__
+     * 
+     * Async operator used in back code to retrieve query Operators.
+     * Don't not try to update or modify theses values.
+    */
+    case Async = 5916;
 }
 ?>

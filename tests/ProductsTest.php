@@ -1,9 +1,7 @@
 <?php
 
-use DisciteDB\Config\Enums\KeyUsage;
-use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
-use DisciteDB\Methods\QueryMethod;
+use DisciteDB\Methods\QueryCondition;
 
     ini_set('display_errors','1');
     ini_set('display_startup_erros','1');
@@ -135,7 +133,7 @@ for ($i = 0; $i < $iterations; $i++) {
     $result = $connection->query("SELECT * FROM `$tableName` WHERE `mouvement_id` != 9999 ");
     $data = $result->fetch_all(MYSQLI_ASSOC);
 
-    
+
     $end = microtime(true);
     $rawTimes[] = ms($start, $end);
 }
@@ -148,7 +146,7 @@ for ($i = 0; $i < $iterations; $i++) {
 
 
     $data = $database->table($tableName)->listing(
-        ['mouvement_id'=>QueryMethod::Not(9999)]
+        ['mouvement_id'=>QueryCondition::Not(9999)]
         )->fetchArray(); // ou $db->$tableName->all();
 
 

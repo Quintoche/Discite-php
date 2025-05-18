@@ -6,6 +6,7 @@ use DisciteDB\Config\Traits\TablesManager\Delete;
 use DisciteDB\Config\Traits\TablesManager\Update;
 use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
+use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Tables\BaseTable;
 use DisciteDB\Tables\CustomTable;
 use DisciteDB\Utilities\NameSanitizer;
@@ -61,9 +62,9 @@ class TablesManager
      * Récupère une instance de table à partir de son nom ou alias.
      *
      * @param string $name Nom ou alias de la table
-     * @return CustomTable
+     * @return CustomTable|QueryResult
      */
-    public function getTable(string $name) : CustomTable
+    public function getTable(string $name) : QueryResult|CustomTable
     {
         return $this->returnClassInMap($name);
     }
@@ -77,21 +78,27 @@ class TablesManager
         $this->map[$tableAlias] = $tableClass;
     }
 
-    private function returnClassInMap(string $className) : null|BaseTable
+    private function returnClassInMap(string $className) : QueryResult|BaseTable
     {
         $table = $this->map[$className] ?? null;
-        if(!$table) throw new \Exception("Table '$className' not found");
+
+        if(!$table) return $this->callException($className);
 
         return $table;
             
     }
 
-    public function __get($name) : BaseTable
+    public function __get($name) : QueryResult|BaseTable
     {
         $table = $this->map[$name] ?? $this->map[NameSanitizer::sanitize($name)] ?? null;
-        if(!$table) throw new \Exception("Table '$name' not found");
+        if(!$table) return $this->callException($name);
 
         return $table;
+    }
+
+    private function callException($tableName)  : QueryResult
+    {
+        return (new QueryManager($this->database))->makeQuery(new ExceptionsManager("Table '$tableName' not found",404,'Database'));
     }
 }
 

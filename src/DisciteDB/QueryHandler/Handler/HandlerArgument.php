@@ -4,8 +4,8 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Config\Enums\QueryOperator;
-use DisciteDB\Methods\QueryClause;
-use DisciteDB\Methods\QueryExpression;
+use DisciteDB\Methods\QueryConditionExpression;
+use DisciteDB\Methods\QueryModifierExpression;
 use DisciteDB\Sql\Data\DataKey;
 use mysqli;
 
@@ -45,7 +45,7 @@ class HandlerArgument
 
         foreach($args as $k => $v)
         {
-            if($v instanceof QueryClause) continue;
+            if($v instanceof QueryModifierExpression) continue;
             $_array[$k] = $v;
         }
 
@@ -89,11 +89,11 @@ class HandlerArgument
     }
     private function createArgsValues(mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value->returnValue($this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnValue($this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnValue($this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnValue($this->connection);
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value->returnCondition($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
     }
 }
 

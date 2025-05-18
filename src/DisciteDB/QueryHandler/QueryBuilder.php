@@ -3,7 +3,7 @@
 namespace DisciteDB\QueryHandler;
 
 use DisciteDB\Core\QueryManager;
-use DisciteDB\Methods\QueryExpression;
+use DisciteDB\Methods\QueryConditionExpression;
 
 class QueryBuilder
 {
@@ -103,7 +103,7 @@ class QueryBuilder
         foreach($this->queryHandler->returnArguments()['VALUES'] as $data)
         {
             if(is_null($data)) continue;
-            if(($data instanceof QueryExpression)) continue;
+            if(($data instanceof QueryConditionExpression)) continue;
             $_array[] = $data;
         }
 

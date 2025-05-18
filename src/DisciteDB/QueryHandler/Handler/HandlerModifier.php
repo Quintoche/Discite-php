@@ -2,8 +2,7 @@
 
 namespace DisciteDB\QueryHandler\Handler;
 
-use DisciteDB\Config\Enums\Operators;
-use DisciteDB\Methods\QueryClause;
+use DisciteDB\Methods\QueryModifierExpression;
 use mysqli;
 
 class HandlerModifier
@@ -35,7 +34,7 @@ class HandlerModifier
 
         foreach($args as $k => $v)
         {
-            if(!$v instanceof QueryClause) continue;
+            if(!$v instanceof QueryModifierExpression) continue;
             $_array[] = $v;
         }
 
@@ -65,7 +64,7 @@ class HandlerModifier
 
     private function createArgsArguments(mixed $value) : ?string
     {
-        return ($value instanceof QueryClause) ? $value->returnCondition($this->connection) : null;
+        return ($value instanceof QueryModifierExpression) ? $value->returnCondition($this->connection) : null;
     }
 }
 

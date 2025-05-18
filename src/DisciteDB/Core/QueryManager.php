@@ -2,6 +2,8 @@
 namespace DisciteDB\Core;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Config\Enums\QueryType;
+use DisciteDB\Database;
 use DisciteDB\QueryHandler\QueryBuilder;
 use DisciteDB\QueryHandler\QueryHandler;
 use DisciteDB\QueryHandler\QueryResult;
@@ -10,29 +12,40 @@ use mysqli;
 
 class QueryManager
 {
-    protected BaseTable $table;
-    
-    protected mysqli $connection;
-    
-    protected Operators $operator;
+    protected Database $database;
 
-    protected QueryHandler $queryHandler;
+    protected ?ExceptionsManager $exception = null;
+    
+    protected ?BaseTable $table = null;
+    
+    protected ?mysqli $connection = null;
+    
+    protected ?Operators $operator = null;
 
-    protected QueryBuilder $queryBuilder;
+    protected ?QueryHandler $queryHandler = null;
+
+    protected ?QueryBuilder $queryBuilder = null;
 
     protected QueryResult $queryResult;
 
-    protected array $args;
+    protected QueryType $queryType = QueryType::Data;
+
+    protected ?array $args = null;
 
     protected ?array $uuid = [];
     
-    protected array $queryArray;
+    protected ?array $queryArray = null;
     
-    protected string $queryString;
+    protected ?string $queryString = null;
 
-    public function __construct()
+    public function __construct(Database $database)
     {
-        
+        $this->database = $database;
+    }
+
+    public function getInstance() : Database
+    {
+        return $this->database;
     }
 
     public function setTable(BaseTable $table) : void
@@ -56,6 +69,10 @@ class QueryManager
     {
         $this->uuid = $uuid;
     }
+    public function setType(QueryType $type) : void
+    {
+        $this->queryType = $type;
+    }
 
     public function getTable() : ?BaseTable
     {
@@ -77,6 +94,10 @@ class QueryManager
     {
         return $this->uuid;
     }
+    public function getType() : QueryType
+    {
+        return $this->queryType;
+    }
 
     public function getQueryHandler() : ?QueryHandler
     {
@@ -93,8 +114,10 @@ class QueryManager
         return $this->queryResult;
     }
     
-    public function makeQuery() : QueryResult
+    public function makeQuery(?ExceptionsManager $exception = null) : QueryResult
     {   
+        $this->setException($exception);
+
         $this->buildHandler();
 
         $this->buildQuery();
@@ -106,17 +129,30 @@ class QueryManager
 
     private function buildHandler() : void
     {
+        if($this->exception) return;
         $this->queryHandler =  new QueryHandler($this);
     }
 
     private function buildQuery() : void
     {
+        if($this->exception) return;
         $this->queryBuilder = new QueryBuilder($this);
     }
 
     private function buildResult() : void
     {
-        $this->queryResult = new QueryResult($this);
+        $this->queryResult = new QueryResult($this, $this->queryType);
+    }
+
+    private function setException(?ExceptionsManager $exception = null) : void
+    {
+        if(!$exception) return;
+        $this->exception = $exception;
+        $this->queryType = QueryType::Exception;
+    }
+    public function getException() : ExceptionsManager
+    {
+        return $this->exception;
     }
 }
 

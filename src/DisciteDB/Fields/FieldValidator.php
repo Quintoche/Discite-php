@@ -4,6 +4,7 @@ namespace DisciteDB\Fields;
 
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Keys\BaseKey;
+use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Methods\QueryExpression;
 
 class FieldValidator
@@ -47,7 +48,7 @@ class FieldValidator
     {
         if($this->isLooseUsage()) return true;
 
-        $lookedValue = ($value instanceof QueryExpression) ? $value->returnArgs() : $value;
+        $lookedValue = ($value instanceof QueryConditionExpression) ? $value->returnArgs() : $value;
 
         if(is_array($lookedValue))
         {

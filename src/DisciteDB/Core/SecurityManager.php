@@ -11,7 +11,10 @@ use DisciteDB\Configuration;
  */
 class SecurityManager
 {
-    
+    public function __construct()
+    {
+        
+    }
 }
 
 ?>

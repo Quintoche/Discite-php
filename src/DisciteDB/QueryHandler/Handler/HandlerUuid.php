@@ -3,7 +3,7 @@
 namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\QueryOperator;
-use DisciteDB\Methods\QueryExpression;
+use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Sql\Data\DataKey;
 use mysqli;
 
@@ -61,13 +61,13 @@ class HandlerUuid
     {
         return DataKey::escape($key, $this->connection);
     }
-    private function createArgsValues(mixed $value) : QueryExpression
+    private function createArgsValues(mixed $value) : QueryConditionExpression
     {
-        return ($value instanceof QueryExpression) ? $value : new QueryExpression(QueryOperator::Equal,[$value]);
+        return ($value instanceof QueryConditionExpression) ? $value : new QueryConditionExpression(QueryOperator::Equal,[$value]);
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryExpression) ? $value->returnCondition($key, $this->connection) : (new QueryExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
     }
 }
 

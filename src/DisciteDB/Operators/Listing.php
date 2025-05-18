@@ -3,17 +3,19 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
-use DisciteDB\Methods\QueryClause;
+use DisciteDB\Methods\QueryModifierExpression;
 use DisciteDB\QueryHandler\QueryResult;
 
 trait Listing
 {
-    public function listing(array $args) : QueryResult
+    public function listing(?array $args) : QueryResult
     {
+        // in_array()
+
         foreach($args as $argKey => $argValue)
         {
-            if($argValue instanceof QueryClause) continue;
-            
+            if($argValue instanceof QueryModifierExpression) continue;
+
             $key = $this->returnKey($argKey);
             
 

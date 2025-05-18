@@ -4,11 +4,12 @@ namespace DisciteDB\QueryHandler\Result;
 
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Core\QueryManager;
+use DisciteDB\Database;
 use DisciteDB\Tables\BaseTable;
 use mysqli;
 use mysqli_result;
 
-class ResultData
+class ResultData extends AbstractResult implements Result
 {
     protected string $query;
 
@@ -24,15 +25,14 @@ class ResultData
 
     protected Operators $operator;
 
-    protected ?string $errorText = null;
-
-    protected ?int $errorCode = null;
+    protected Database $database;
     
-    public function __construct(string $query, mysqli $connection, Operators $operator)
+    public function __construct(string $query, mysqli $connection, Operators $operator, Database $database)
     {
         $this->query = $query;
         $this->connection = $connection;
         $this->operator = $operator;
+        $this->database = $database;
 
         $this->executeQuery();
         $this->processResult();
@@ -101,7 +101,7 @@ class ResultData
 
         if(!$_uuid) return;
 
-        $_manager = new QueryManager();
+        $_manager = new QueryManager($this->database);
         $_manager->setTable($table);
         $_manager->setConnection($this->connection);
         $_manager->setOperator(Operators::Retrieve);
@@ -140,8 +140,8 @@ class ResultData
     {
         $this->resultData = [];
         $this->resultRows = 0;
-        $this->errorText = mysqli_error($this->connection);
-        $this->errorCode = mysqli_errno($this->connection);
+        $this->exceptionText = mysqli_error($this->connection);
+        $this->exceptionCode = mysqli_errno($this->connection);
     }
 
     
@@ -186,23 +186,14 @@ class ResultData
         return $this->resultRows;
     }
 
-    /**
-     * Retourne les éventuelles erreurs rencontrées.
-     */
-    public function getResultError(): array
-    {
-        return [
-            'text' => $this->errorText,
-            'code' => $this->errorCode,
-        ];
-    }
+
 
     /**
      * Indique si la requête a échoué.
      */
     public function hasError(): bool
     {
-        return $this->errorText !== null;
+        return $this->exceptionText !== null;
     }
 
     /**

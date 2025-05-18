@@ -9,13 +9,21 @@ use DisciteDB\Database;
  * __Work in progress__.
  * 
  */
+
 class UsersManager
 {
-    protected Database $database;
-    
+    private Database $database;
+
+    protected array $map = [];
+
     public function __construct(Database $database)
     {
         $this->database = $database;
+    }
+
+    public function create($user)
+    {
+        
     }
 }
 

@@ -2,11 +2,15 @@
 namespace DisciteDB;
 
 use DisciteDB\Config\Enums\TableUsage;
+use DisciteDB\Core\ExceptionsManager;
 use DisciteDB\Core\KeysManager;
 use DisciteDB\Core\LogsManager;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Core\SecurityManager;
 use DisciteDB\Core\TablesManager;
 use DisciteDB\Core\UsersManager;
+use DisciteDB\Exceptions\TableException;
+use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Tables\TableInterface;
 use mysqli;
 
@@ -197,7 +201,7 @@ class Database
      * 
      * @throws \Exception Throws exception if table is not defined.
      */
-    public function table(string $name): TableInterface
+    public function table(string $name): QueryResult|TableInterface
     {
         return $this->getTable($name);
     }
@@ -214,7 +218,7 @@ class Database
      * 
      * @throws \Exception Throws exception if table is not defined.
      */
-    public function __get(string $name): TableInterface
+    public function __get(string $name): QueryResult|TableInterface
     {
         return $this->getTable($name);
     }
@@ -226,17 +230,18 @@ class Database
      * @param string $name Table name.
      * 
      * @return TableInterface Table interface instance.
+     * @return QueryResult Throws exception if table is not defined.
      * 
-     * @throws \Exception Throws exception if table is not defined.
      */
-    private function getTable(string $name): TableInterface
+    private function getTable(string $name): TableInterface|QueryResult
     {
         $table = ($this->config()->getTableUsage() === TableUsage::LooseUsage)
             ? $this->tables()->create($name, ['alias' => $name])->getName()
             : $name;
 
-        return $this->tables()->getTable($table) ?? throw new \Exception("Table '$name' not defined.");
+        return $this->tables()->getTable($table);
     }
 }
 
 ?>
+

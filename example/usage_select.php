@@ -2,7 +2,7 @@
 
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
-use DisciteDB\Methods\QueryMethod;
+use DisciteDB\Methods\QueryCondition;
 use DisciteDB\Methods\QueryModifier;
 
 ini_set('display_errors','1');
@@ -29,16 +29,16 @@ error_reporting(E_ALL);
 
     // To show how to make "SELECT" query, I've prefere to make loose usage for 
     // both table and keys.
-    $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
+    $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
     $disciteDB->conf()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
 
 
     // QUERY -- SELECT
     $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
-        'name'=>QueryMethod::Not('White Widget'),
-        'description'=>QueryMethod::Contains('and',QueryLocation::Between),
-        'price' => QueryMethod::LessOrEqual(25),
-        QueryModifier::order(DisciteDB::SORT_DESC,'named')
+        'name'=>QueryCondition::Not('White Widget'),
+        'description'=>QueryCondition::Contains('and',QueryLocation::Between),
+        'price' => QueryCondition::LessOrEqual(25),
+        QueryModifier::order(DisciteDB::SORT_DESC,'name')
     ]);
 
     // After that, you can show values :

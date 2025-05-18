@@ -60,11 +60,11 @@ trait Update
         return match (true) {
             $table instanceof BaseTable => $table,
             $this->database->tables()->$table => $this->database->tables()->$table,
-            default => $this->createDefaultTable($table),
+            default => $this->updateDefaultTable($table),
         };
     }
 
-    protected function createDefaultTable(string $tableName) : BaseTable
+    protected function updateDefaultTable(string $tableName) : BaseTable
     {
         return $this->database->tables()->create($tableName);
     }

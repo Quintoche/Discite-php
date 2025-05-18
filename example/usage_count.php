@@ -2,7 +2,7 @@
 
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
-use DisciteDB\Methods\QueryMethod;
+use DisciteDB\Methods\QueryCondition;
 
 ini_set('display_errors','1');
 ini_set('display_startup_erros','1');
@@ -34,9 +34,9 @@ error_reporting(E_ALL);
 
     // QUERY -- COUNT
     $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->count([
-        'name'=>QueryMethod::Not('White Widget'),
-        'description'=>QueryMethod::Contains('and',QueryLocation::Between),
-        'price' => QueryMethod::LessOrEqual(25),
+        'name'=>QueryCondition::Not('White Widget'),
+        'description'=>QueryCondition::Contains('and',QueryLocation::Between),
+        'price' => QueryCondition::LessOrEqual(25),
     ]);
 
     // After that, you can show values :

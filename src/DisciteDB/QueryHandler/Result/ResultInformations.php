@@ -15,42 +15,51 @@ class ResultInformations
         return time();
     }
 
-    public static function handleQueryArray(QueryManager $queryManager, ResultData $queryResult) : array
+    public static function handleQueryArray(QueryManager $queryManager, Result $queryResult) : array
     {
         return [
-            'operator' => self::handleQueryOperator($queryManager),
-            'table' => self::handleQueryTable($queryManager),
-            'gaveArgments' => self::handleQueryArgs($queryManager),
-            'affectedRows' => self::handleQueryRows($queryResult),
+            'operator' => self::handleQueryOperator($queryManager) ?? null,
+            'table' => self::handleQueryTable($queryManager) ?? null,
+            'context' => self::handleQueryContext($queryResult) ?? null,
+            'gaveArgments' => self::handleQueryArgs($queryManager) ?? null,
+            'affectedRows' => self::handleQueryRows($queryResult) ?? null,
         ];
     }
 
-    private static function handleQueryOperator(QueryManager $queryManager) : string
+    private static function handleQueryOperator(QueryManager $queryManager) : ?string
     {
-        return $queryManager->getOperator()->name;
+        if(!$queryManager->getOperator()) return null;
+        return $queryManager->getOperator()->name ?? null;
     }
 
-    private static function handleQueryTable(QueryManager $queryManager) : string
+    private static function handleQueryTable(QueryManager $queryManager) : ?string
     {
-        return $queryManager->getTable()->getAlias() ?? $queryManager->getTable()->getName();
+        if(!$queryManager->getTable()) return null;
+        return $queryManager->getTable()->getAlias() ?? $queryManager->getTable()->getName() ?? null;
+    }
+
+    private static function handleQueryContext(Result $queryResult) : ?string
+    {
+        return $queryResult->getContext() ?? null;
     }
 
     private static function handleQueryArgs(QueryManager $queryManager) : int
     {
-        return sizeof($queryManager->getArgs());
+        if(!$queryManager->getArgs()) return 0;
+        return sizeof($queryManager->getArgs()) ?? 0;
     }
 
-    private static function handleQueryRows(ResultData $queryResult) : ?int
+    private static function handleQueryRows(Result $queryResult) : ?int
     {
-        return $queryResult->getResulRows();
+        return $queryResult->getResulRows() ?? 0;
     }
 
-    public static function handleQueryStatus(ResultData $queryResult) : string
+    public static function handleQueryStatus(Result $queryResult) : string
     {
         return (!$queryResult->hasError()) ? 'success' : 'error';
     }
 
-    public static function handleQueryErrors(ResultData $queryResult) : ?array
+    public static function handleQueryErrors(Result $queryResult) : ?array
     {
         if(!$queryResult->hasError())
         {

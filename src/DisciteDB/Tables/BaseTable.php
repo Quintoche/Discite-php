@@ -3,6 +3,7 @@
 namespace DisciteDB\Tables;
 
 use DisciteDB\Config\Enums\QuerySort;
+use DisciteDB\Config\Enums\QueryType;
 use DisciteDB\Database;
 use DisciteDB\Connection;
 
@@ -135,7 +136,7 @@ abstract class BaseTable implements TableInterface
         $this->indexKey = new TemplateId($this->database);
 
         // Set up query manager and associate it with this table and connection
-        $this->query = new QueryManager();
+        $this->query = new QueryManager($this->database);
         $this->query->setTable($this);
         $this->query->setConnection($this->database->connection()->get());
     }

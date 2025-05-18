@@ -3,31 +3,82 @@
 namespace DisciteDB\QueryHandler;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Config\Enums\QueryType;
+use DisciteDB\Core\ExceptionsManager;
 use DisciteDB\Core\QueryManager;
+use DisciteDB\QueryHandler\Result\Result;
 use DisciteDB\QueryHandler\Result\ResultData;
+use DisciteDB\QueryHandler\Result\ResultExceptions;
 use DisciteDB\QueryHandler\Result\ResultInformations;
 
 class QueryResult
 {
     private QueryManager $queryManager;
 
-    private ?ResultData $result = null;
+    private QueryType $queryType;
+
+    private ?Result $result = null;
+
+    private ?ExceptionsManager $exception = null;
 
 
-    public function __construct(QueryManager $queryManager)
+    public function __construct(QueryManager $queryManager, ?QueryType $queryType = null)
     {
         $this->queryManager = $queryManager;
-        $this->result = $this->performResult();
-
-        $this->handleOtherResult();
+        
+        $this->queryType = $queryType ?? $this->queryManager->getType();
+        
+        $this->selectResultType();
     }
 
-    private function performResult() : ResultData
+    private function selectResultType() : void
     {
-        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator());
+        match($this->queryType)
+        {
+            QueryType::Data => $this->resultData(),
+            QueryType::Async => $this->resultAsync(),
+            QueryType::Exception => $this->resultException(),
+            default => $this->resultData(),
+        };
     }
 
-    private function handleOtherResult()
+    private function resultData() : void
+    {
+        $this->result = $this->performResultData();
+        $this->handleOtherResultData();
+    }
+
+    private function resultAsync() : void
+    {
+        $this->result = $this->performResultData();
+        $this->handleOtherResultData();
+    }
+
+    private function resultException() : void
+    {
+        $this->exception = $this->queryManager->getException();
+
+        $this->result = $this->performResultException();
+    }
+
+
+    private function performResultException() : ResultExceptions
+    {
+        return new ResultExceptions($this->exception);
+    }
+
+    private function performResultData() : ResultData
+    {
+        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator(),$this->queryManager->getInstance());
+    }
+    
+    private function performResultAsync() : ResultData
+    {
+        // $this->queryManager->getInstance()->security()
+        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator(),$this->queryManager->getInstance());
+    }
+
+    private function handleOtherResultData()
     {
         match ($this->queryManager->getOperator()) {
             Operators::Create => $this->result->handleNewResult(mysqli_insert_id($this->queryManager->getConnection()) ?? null, $this->queryManager->getTable()),
@@ -91,9 +142,60 @@ class QueryResult
         ];
     }
 
-    public function count() : int
+    public function rows() : int
     {
         return $this->result->getResulRows() ?? 0;
+    }
+
+
+    // 
+    // Functions for 
+    // 
+
+
+    public function all($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function compare($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function count($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function create($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function delete($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function keys($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function listing($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function retrieve($args) : QueryResult
+    {
+        return $this;
+    }
+
+    public function update($args) : QueryResult
+    {
+        return $this;
     }
 
 }
