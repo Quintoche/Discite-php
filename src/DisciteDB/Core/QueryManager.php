@@ -7,6 +7,7 @@ use DisciteDB\Database;
 use DisciteDB\QueryHandler\QueryBuilder;
 use DisciteDB\QueryHandler\QueryHandler;
 use DisciteDB\QueryHandler\QueryResult;
+use DisciteDB\Sql\Clause\ClauseArgument;
 use DisciteDB\Tables\BaseTable;
 use mysqli;
 
@@ -63,7 +64,7 @@ class QueryManager
     }
     public function setArgs(?array $args) : void
     {
-        $this->args = $args ?? [];
+        $this->args = ClauseArgument::evaluateArguments($args, $this, $this->database) ?? [];
     }
     public function setUuid(?array $uuid = null) : void
     {

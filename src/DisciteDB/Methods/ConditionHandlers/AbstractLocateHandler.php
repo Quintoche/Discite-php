@@ -2,6 +2,7 @@
 
 namespace DisciteDB\Methods\ConditionHandlers;
 
+use DisciteDB\Config\Enums\QueryCondition;
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\Sql\Data\DataKey;
 use DisciteDB\Sql\Data\DataValue;
@@ -17,9 +18,11 @@ abstract class AbstractLocateHandler
 
     protected mysqli $connection;
 
+    protected QueryCondition $modifier;
+
     protected QueryLocation $queryLocation;
     
-    protected string $templateUnique = '{KEY} = {VALUE}';
+    protected string $templateUnique = '{TABLE}.{KEY} = {VALUE}';
     
     protected string $templateSeparator = ' ';
     
@@ -59,6 +62,30 @@ abstract class AbstractLocateHandler
         $this->parts = $this->formatStructure();
 
         return $this->formatForm();
+    }
+
+    public function toDatas() : array
+    {
+        return [
+            'key' => $this->getKey(),
+            'value' => $this->getValue(),
+            'modifier' => $this->getModifier(),
+        ];
+    }
+    
+    protected function getKey() : string
+    {
+        return $this->key;
+    }
+
+    protected function getValue() : mixed
+    {
+        return $this->value;
+    }
+
+    protected function getModifier() : QueryCondition
+    {
+        return $this->modifier;
     }
 
     protected function escapeKey() : string

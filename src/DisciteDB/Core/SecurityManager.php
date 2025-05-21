@@ -15,6 +15,16 @@ class SecurityManager
     {
         
     }
+
+
+    public function resolveCsrf()
+    {
+
+    }
+    public function resolveAsyncHandler()
+    {
+        
+    }
 }
 
 ?>

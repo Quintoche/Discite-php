@@ -3,39 +3,20 @@
 namespace DisciteDB\Operators;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Methods\QueryMethodExpression;
 use DisciteDB\Methods\QueryModifierExpression;
 use DisciteDB\QueryHandler\QueryResult;
+use DisciteDB\Sql\Clause\ClauseMethod;
 
 trait Listing
 {
     public function listing(?array $args) : QueryResult
     {
-        // in_array()
-
-        foreach($args as $argKey => $argValue)
-        {
-            if($argValue instanceof QueryModifierExpression) continue;
-
-            $key = $this->returnKey($argKey);
-            
-
-            if(is_null($key))
-            {
-                unset($args[$argKey]);
-                continue;
-            }
-
-            if(!$key->validateField(Operators::Listing,$argValue))
-            {
-                unset($args[$argKey]);
-                continue;
-            }
-            
-            $args[$argKey] = $key->generateField();
-        }
-
+        
         $this->query->setOperator(Operators::Listing);
         $this->query->setArgs($args);
+
+        if(ClauseMethod::hasQueryMethod($args)) echo '<pre>',var_dump((new ClauseMethod($this, Operators::Listing, $this->query->getConnection(), $this->query->getInstance(), $args))->makeQuery()),'</pre>';
 
         return $this->query->makeQuery();
     }

@@ -1,12 +1,15 @@
 <?php
 namespace DisciteDB\Core;
 
+use DisciteDB\Config\Traits\KeysManager\Create;
 use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Utilities\NameSanitizer;
 
 class KeysManager
 {
+    use Create;
+    
     private Database $database;
 
     protected array $map = [];
@@ -30,7 +33,7 @@ class KeysManager
 
         $class->setAlias($parms['alias'] ?? $class->getAlias() ?? $keyName);
 
-        $this->registerKey($class->getAlias(),$class);
+        $this->registerKey($keyName,$class);
 
         return $class;
     }
@@ -60,19 +63,19 @@ class KeysManager
 
     }
 
-    private function registerKey(string $keyAlias, BaseKey $keyClass) : void
+    protected function registerKey(string $keyAlias, BaseKey $keyClass) : void
     {
         $this->map[$keyAlias] = $keyClass;
     }
 
-    private function returnClassInMap(string $className) : null|BaseKey
+    protected function returnClassInMap(string $className) : null|BaseKey
     {
         $key = $this->map[$className] ?? null;
         if(!$key) throw new \Exception("Key '$className' not found");
 
         return $key;
     }
-    private function returnTemplateKeys(string $className) : null|string
+    protected function returnTemplateKeys(string $className) : null|string
     {
         return (class_exists('\\DisciteDB\\Keys\\KeyTemplates\\Template'.$className)) ? '\\DisciteDB\\Keys\\KeyTemplates\\Template'.$className : null;
     }

@@ -1,11 +1,12 @@
 <?php
 namespace DisciteDB;
 
+use DisciteDB\Config\Default\JoinConfig;
 use DisciteDB\Config\Default\NamingConfig;
 use DisciteDB\Config\Default\TypeConfig;
 use DisciteDB\Config\Default\UsageConfig;
 use DisciteDB\Config\Default\ValuesConfig;
-
+use DisciteDB\Config\Enums\JoinMethod;
 use DisciteDB\Config\Enums\NamingConvention;
 use DisciteDB\Config\Enums\TableUsage;
 use DisciteDB\Config\Enums\KeyUsage;
@@ -111,6 +112,84 @@ class Configuration
 
 
     /**
+     * Set the maximums of iterations a query can make for "join".
+     * 
+     * @param int $MAX_ITERATIONS max interations.
+     * 
+     * @return void
+     */
+    public function setJoinMaxIterations(int $maxInterations = 0) : void
+    {
+        JoinConfig::$MAX_ITERATIONS = $maxInterations;
+    }
+
+
+    /**
+     * Get the current max iterations setting.
+     * 
+     * Defaults to 0 => no maximuns.
+     * 
+     * @return int Max iterations.
+     */
+    public function getJoinMaxIterations() : int
+    {
+        return JoinConfig::$MAX_ITERATIONS;
+    }
+
+
+    /**
+     * Set the method for joining queries.
+     * 
+     * @param JoinMethod $JoinMethod Joining method.
+     * 
+     * @return void
+     */
+    public function setJoinMethod(JoinMethod $JoinMethod) : void
+    {
+        JoinConfig::$JOIN_METHOD = $JoinMethod;
+    }
+
+
+    /**
+     * Get the current method for joining queries.
+     * 
+     * Defaults to JOIN_METHOD_FLAT.
+     * 
+     * @return JoinMethod Joining method.
+     */
+    public function getJoinMethod() : JoinMethod
+    {
+        return JoinConfig::$JOIN_METHOD;
+    }
+
+
+    /**
+     * Set the join separator for concat method.
+     * 
+     * @param string $joinSeparator Join separator
+     * 
+     * @return void
+     */
+    public function setJoinSeparator(string $joinSeparator) : void
+    {
+        JoinConfig::$JOIN_SEPERATOR = $joinSeparator;
+    }
+
+
+    /**
+     * Get the current defined join separator.
+     * 
+     * Defaults to ', '.
+     * 
+     * @return string Join separator.
+     */
+    public function getJoinSeparator() : string
+    {
+        return JoinConfig::$JOIN_SEPERATOR;
+    }
+
+
+    /**
      * Set the naming convention used in database object names.
      * 
      * Default is NAMING_CONVENTION_UNDEFINED.
@@ -171,7 +250,7 @@ class Configuration
      * 
      * @return KeyUsage Enum representing key usage mode.
      */
-    public function getKeyusage() : KeyUsage
+    public function getKeyUsage() : KeyUsage
     {
         return UsageConfig::$KEY_USAGE;
     }

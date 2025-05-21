@@ -21,7 +21,7 @@ trait Update
         $this->createAppendTable($this->updateSelectName($tableName,$parms['alias']),$class);
     } 
 
-    public function modify(BaseTable|string $tableName, ?string $alias = null, ?string $prefix = null, BaseKey|string|null $indexKey = null, ?QuerySort $sort = DisciteDB::SORT_NO_SORT) : BaseTable
+    public function modify(BaseTable|string $tableName, ?string $alias = null, ?string $prefix = null, BaseKey|string|null $primaryKey = null, ?QuerySort $sort = DisciteDB::SORT_NO_SORT) : BaseTable
     {
         $class = $this->updateGetTable($tableName);
 
@@ -29,9 +29,9 @@ trait Update
         if($alias) $class->setAlias($alias);
         if($prefix) $class->setPrefix($prefix);
 
-        if($indexKey)
+        if($primaryKey)
         {
-            $class->setIndexKey($this->updateGetKey($indexKey));
+            $class->setPrimaryKey($this->updateGetKey($primaryKey));
         } 
         
         $class->setSort($sort);

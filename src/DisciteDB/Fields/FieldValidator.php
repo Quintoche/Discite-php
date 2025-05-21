@@ -6,6 +6,7 @@ use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Methods\QueryExpression;
+use DisciteDB\Sql\Clause\ClauseArgument;
 
 class FieldValidator
 {
@@ -47,8 +48,9 @@ class FieldValidator
     private function validateIni(mixed $value) : bool
     {
         if($this->isLooseUsage()) return true;
-
+        
         $lookedValue = ($value instanceof QueryConditionExpression) ? $value->returnArgs() : $value;
+
 
         if(is_array($lookedValue))
         {

@@ -2,6 +2,7 @@
 namespace DisciteDB;
 
 use DisciteDB\Config\Enums\TableUsage;
+use DisciteDB\Core\DebugManager;
 use DisciteDB\Core\ExceptionsManager;
 use DisciteDB\Core\KeysManager;
 use DisciteDB\Core\LogsManager;
@@ -11,6 +12,9 @@ use DisciteDB\Core\TablesManager;
 use DisciteDB\Core\UsersManager;
 use DisciteDB\Exceptions\TableException;
 use DisciteDB\QueryHandler\QueryResult;
+use DisciteDB\Sql\Loading\Handler;
+use DisciteDB\Sql\Loading\HandlerDatabase;
+use DisciteDB\Sql\Loading\HandlerFile;
 use DisciteDB\Tables\TableInterface;
 use mysqli;
 
@@ -68,6 +72,12 @@ class Database
 
 
     /**
+     * @var DebugManager Debug manager instance.
+     */
+    protected DebugManager $debugManager;
+
+
+    /**
      * Database constructor.
      * 
      * Initializes connection and all sub-managers.
@@ -88,6 +98,7 @@ class Database
         $this->usersManager = new UsersManager($this);
         $this->logsManager = new LogsManager($this);
         $this->securityManager = new SecurityManager($this);
+        $this->debugManager = new DebugManager($this);
     }
 
 
@@ -191,6 +202,17 @@ class Database
 
 
     /**
+     * Access the debug manager.
+     * 
+     * @return DebugManager Users manager instance.
+     */
+    public function debug(): DebugManager
+    {
+        return $this->debugManager;
+    }
+
+
+    /**
      * Retrieve a table interface by its name.
      * 
      * Shortcut to getTable() method.
@@ -221,6 +243,35 @@ class Database
     public function __get(string $name): QueryResult|TableInterface
     {
         return $this->getTable($name);
+    }
+
+    /**
+     * Load tables and keys from database.
+     * 
+     * Allow you to stay in strict mode without defining each tables and keys.
+     * 
+     * @return void
+     *
+     */
+    public function loadFromDatabase() : void
+    {
+        new HandlerDatabase($this->connection()->get(), $this);
+    }
+
+    /**
+     * Load tables and keys from cache file.
+     * 
+     * Allow you to stay in strict mode without defining each tables and keys.
+     * 
+     * @param string $path put the absolute path to get into cache file
+     * @param int $updatingTime Insert here the time you want library to update your file from database
+     * 
+     * @return void
+     *
+     */
+    public function loadFromFile(string $path, int $updatingTime) : void
+    {
+        new HandlerFile($path, $updatingTime, $this->connection()->get(), $this);
     }
 
 

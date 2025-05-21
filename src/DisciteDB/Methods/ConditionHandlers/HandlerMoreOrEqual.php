@@ -2,6 +2,8 @@
 
 namespace DisciteDB\Methods\ConditionHandlers;
 
+use DisciteDB\Config\Enums\QueryCondition;
+
 class HandlerMoreOrEqual extends AbstractBaseHandler implements ArgumentHandlerInterface
 {
     protected string $templateUnique = '{KEY} >= {VALUE}';
@@ -9,6 +11,8 @@ class HandlerMoreOrEqual extends AbstractBaseHandler implements ArgumentHandlerI
     protected string $templateSeparator = ' ';
 
     protected string $templateForm = '{UNIQUE}';
+
+    protected QueryCondition $modifier = QueryCondition::MoreOrEqual;
 }
 
 ?>

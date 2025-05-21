@@ -35,6 +35,11 @@ class ResultAsync extends AbstractResult implements Result
 
     }
 
+    private function checkToken()
+    {
+        
+    }
+
     public function getResult() : mixed
     {
         return null;

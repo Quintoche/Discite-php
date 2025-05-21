@@ -7,6 +7,7 @@ use DisciteDB\Config\Enums\NamingConvention;
 use DisciteDB\Config\Enums\TableUsage;
 use DisciteDB\Config\Enums\DefaultValue;
 use DisciteDB\Config\Enums\IndexType;
+use DisciteDB\Config\Enums\JoinMethod;
 use DisciteDB\Config\Enums\KeyUsage;
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\Config\Enums\QuerySort;
@@ -601,4 +602,41 @@ class DisciteDB
      * @var TypeString
      */
     public const TYPE_STRING_PASSWORD = TypeString::Password;
+
+
+
+    /* === Join method === */
+
+
+    /**
+     * Flat joining method.
+     *
+     * @var JoinMethod
+     */
+    public const JOIN_METHOD_FLAT = JoinMethod::Flat;
+
+
+    /**
+     * Concat joining method.
+     *
+     * @var JoinMethod
+     */
+    public const JOIN_METHOD_CONCAT = JoinMethod::Concat;
+
+
+    /**
+     * Json joining method.
+     *
+     * @var JoinMethod
+     */
+    public const JOIN_METHOD_JSON = JoinMethod::Json;
+
+
+    /**
+     * Multidimensional array joining method.
+     *
+     * @var JoinMethod
+     */
+    public const JOIN_METHOD_MULTIDIMENSIONAL_ARRAY = JoinMethod::MultidimensionalArray;
+    
 }

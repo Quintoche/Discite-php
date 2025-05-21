@@ -72,7 +72,7 @@ $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
     $database->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
 $tableName = 'gfis_admn_mouvements';
-$iterations = 500;
+$iterations = 5000;
 
 // Utils
 function ms(float $start, float $end): float {

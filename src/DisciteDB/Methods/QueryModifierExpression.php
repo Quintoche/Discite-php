@@ -25,14 +25,14 @@ class QueryModifierExpression
         $this->defaultOperatorArgs($arguments);
     }
 
-    public function returnCondition(mysqli $connection) : ?string
+    public function returnSql(mysqli $connection) : ?string
     {
         $this->connection = $connection;
 
         return match ($this->queryOperator)
         {
-            QueryOperator::Sort => (new HandlerSort($this->arguments,$this->connection))->toCondition(),
-            QueryOperator::Limit => (new HandlerLimit($this->arguments,$this->connection))->toCondition(),
+            QueryOperator::Sort => (new HandlerSort($this->arguments,$this->connection))->toSql(),
+            QueryOperator::Limit => (new HandlerLimit($this->arguments,$this->connection))->toSql(),
             default => null,
         };
     }

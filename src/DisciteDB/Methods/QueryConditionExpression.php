@@ -2,6 +2,7 @@
 
 namespace DisciteDB\Methods;
 
+use DisciteDB\Config\Default\ConnectionConfig;
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\Config\Enums\QueryOperator;
 use DisciteDB\Methods\ConditionHandlers\HandlerBetween;
@@ -61,6 +62,29 @@ class QueryConditionExpression
             QueryOperator::MoreOrEqual => (new HandlerMoreOrEqual($key,$this->arguments,$this->connection))->toCondition(),
             QueryOperator::LessOrEqual => (new HandlerLessOrEqual($key,$this->arguments,$this->connection))->toCondition(),
             default => (new HandlerEqual($key,$this->arguments,$this->connection))->toCondition(),
+        };
+    }
+    
+    public function toDatas(string $key, mysqli $connection) : ?array
+    {
+        $this->connection = $connection;
+
+        return match ($this->queryOperator)
+        {
+            QueryOperator::Or => (new HandlerOr($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::Contains => (new HandlerContains($key,$this->arguments,$this->queryLocation,$this->connection))->toDatas(),
+            QueryOperator::Like => (new HandlerLike($key,$this->arguments,$this->queryLocation,$this->connection))->toDatas(),
+            QueryOperator::NotLike => (new HandlerNotLike($key,$this->arguments,$this->queryLocation,$this->connection))->toDatas(),
+            QueryOperator::Between => (new HandlerBetween($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::Not => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toDatas() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::NotIn => (sizeof($this->arguments) == 1) ? (new HandlerNot($key,$this->arguments,$this->connection))->toDatas() : (new HandlerNotIn($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::NotContains => (new HandlerNotContains($key,$this->arguments,$this->queryLocation,$this->connection))->toDatas(),
+            QueryOperator::NotBetween => (new HandlerNotBetween($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::MoreThan => (new HandlerMoreThan($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::LessThan => (new HandlerLessThan($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::MoreOrEqual => (new HandlerMoreOrEqual($key,$this->arguments,$this->connection))->toDatas(),
+            QueryOperator::LessOrEqual => (new HandlerLessOrEqual($key,$this->arguments,$this->connection))->toDatas(),
+            default => (new HandlerEqual($key,$this->arguments,$this->connection))->toDatas(),
         };
     }
     

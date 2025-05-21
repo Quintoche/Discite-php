@@ -107,7 +107,7 @@ class Connection
      */
     public function __destruct()
     {
-        @$this->mysqli->close();
+        // @$this->mysqli->close();
     }
 
 

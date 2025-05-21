@@ -36,6 +36,7 @@ class QueryBuilder
         $this->query = $this->searchReplace($this->query,$this->queryHandler->returnStructure());
         $this->query = $this->searchReplace($this->query,array_merge($this->associateKeys(),$this->associateValues(),$this->associateArgs(),$this->associateModifier()));
         $this->query = $this->searchReplace($this->query,$this->associateUuid());
+        $this->query = $this->searchReplace($this->query,['TABLE' => $this->queryHandler->returnStructure()['TABLE']]);
 
         return $this->query;
     }
@@ -43,9 +44,11 @@ class QueryBuilder
     private function associateTemplate() : void
     {
         $_array = [];
-        foreach($this->queryHandler->returnTemplate() as $data)
+
+        foreach($this->queryHandler->returnTemplate() as $i => $data)
         {
             if(is_null($data)) continue;
+            if($i == 'Methods') $this->associateMethods($data);
 
             $_array[] = $data;
         }
@@ -122,6 +125,26 @@ class QueryBuilder
         }
 
         return ['MODIFIER'=>implode(' ',$_array)];
+    }
+
+    private function associateMethods(string &$template) : void
+    {
+        if($this->queryHandler->returnMethods()['COUNT'] == 0) {$template = null; return;}
+
+        $_array = [];
+        
+        for($j=0;$j<(int)$this->queryHandler->returnMethods()['COUNT'];$j++)
+        {
+            $_template = $template;
+            $_table = $this->queryHandler->returnMethods()['TABLE'][$j];
+            $_indexKey = $this->queryHandler->returnMethods()['INDEX_KEY'][$j];
+            $_tableForeign = $this->queryHandler->returnMethods()['TABLE_FOREIGN'][$j];
+            $_foreignPrimaryKey = $this->queryHandler->returnMethods()['FOREIGN_PRIMARY_KEY'][$j];
+
+            
+            $_array[] = $this->searchReplace($_template,['TABLE'=>$_table,'INDEX_KEY'=>$_indexKey,'TABLE_FOREIGN'=>$_tableForeign,'FOREIGN_PRIMARY_KEY'=>$_foreignPrimaryKey]);
+        }
+        $template = implode(' ',$_array);
     }
 
     private function searchReplace(string $haystack, array|string $needle) : string

@@ -2,6 +2,8 @@
 namespace DisciteDB\Core;
 
 use DisciteDB\Database;
+use DisciteDB\Users\BaseUser;
+use DisciteDB\Users\CustomUser;
 
 /**
  * __WIP__
@@ -21,9 +23,9 @@ class UsersManager
         $this->database = $database;
     }
 
-    public function create($user)
+    public function create($user) : BaseUser
     {
-        
+        return new CustomUser($this->database);
     }
 }
 

@@ -17,9 +17,9 @@ trait Create
         $class->setMagicValue('name',$tableName);
         foreach($parms as $k => $v)
         {
-            if($k == 'indexKey')
+            if($k == 'primaryKey')
             {
-                $class->setIndexKey($this->createGetKey($v));
+                $class->setPrimaryKey($this->createGetKey($v));
                 continue;
             }
             $class->setMagicValue($k,$v);
@@ -30,7 +30,7 @@ trait Create
         return $class;
     }
 
-    public function add(string $name, ?string $alias = null, ?string $prefix = null, BaseKey|string|null $indexKey = null, ?QuerySort $sort = DisciteDB::SORT_NO_SORT) : BaseTable
+    public function add(string $name, ?string $alias = null, ?string $prefix = null, BaseKey|string|null $primaryKey = null, ?QuerySort $sort = DisciteDB::SORT_NO_SORT) : BaseTable
     {
         $class = $this->createInitializeTable();
 
@@ -38,9 +38,9 @@ trait Create
         if($alias) $class->setAlias($alias);
         if($prefix) $class->setPrefix($prefix);
 
-        if($indexKey)
+        if($primaryKey)
         {
-            $class->setIndexKey($this->createGetKey($indexKey));
+            $class->setPrimaryKey($this->createGetKey($primaryKey));
         } 
         
         $class->setSort($sort);

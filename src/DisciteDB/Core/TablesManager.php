@@ -8,7 +8,6 @@ use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Tables\BaseTable;
-use DisciteDB\Tables\CustomTable;
 use DisciteDB\Utilities\NameSanitizer;
 
 class TablesManager
@@ -62,9 +61,9 @@ class TablesManager
      * Récupère une instance de table à partir de son nom ou alias.
      *
      * @param string $name Nom ou alias de la table
-     * @return CustomTable|QueryResult
+     * @return BaseTable|QueryResult
      */
-    public function getTable(string $name) : QueryResult|CustomTable
+    public function getTable(?string $name) : QueryResult|BaseTable
     {
         return $this->returnClassInMap($name);
     }
@@ -78,7 +77,7 @@ class TablesManager
         $this->map[$tableAlias] = $tableClass;
     }
 
-    private function returnClassInMap(string $className) : QueryResult|BaseTable
+    private function returnClassInMap(?string $className) : QueryResult|BaseTable
     {
         $table = $this->map[$className] ?? null;
 

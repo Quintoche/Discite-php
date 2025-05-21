@@ -22,9 +22,9 @@ trait TableTraitGet
         return $this->prefix ?? null;
     }
 
-    public function getIndexKey() : BaseKey|null
+    public function getPrimaryKey() : BaseKey|null
     {
-        return $this->indexKey ?? null;
+        return $this->primaryKey ?? null;
     }
 
     public function getSort() : QuerySort|null

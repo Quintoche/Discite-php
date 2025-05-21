@@ -64,7 +64,7 @@ class HandlerModifier
 
     private function createArgsArguments(mixed $value) : ?string
     {
-        return ($value instanceof QueryModifierExpression) ? $value->returnCondition($this->connection) : null;
+        return ($value instanceof QueryModifierExpression) ? $value->returnSql($this->connection) : null;
     }
 }
 

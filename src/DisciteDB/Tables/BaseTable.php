@@ -94,7 +94,7 @@ abstract class BaseTable implements TableInterface
      *
      * @var BaseKey|null
      */
-    protected ?BaseKey $indexKey = null;
+    protected ?BaseKey $primaryKey = null;
 
 
     /**
@@ -133,7 +133,7 @@ abstract class BaseTable implements TableInterface
         $this->connection = $this->database->connection();
 
         // Assign a default key template for indexing
-        $this->indexKey = new TemplateId($this->database);
+        $this->primaryKey = new TemplateId($this->database);
 
         // Set up query manager and associate it with this table and connection
         $this->query = new QueryManager($this->database);

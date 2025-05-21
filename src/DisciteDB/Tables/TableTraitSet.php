@@ -23,9 +23,9 @@ trait TableTraitSet
         $this->prefix = $prefix;
     }
 
-    public function setIndexKey(BaseKey|null $key) : void
+    public function setPrimaryKey(BaseKey|null $key) : void
     {
-        $this->indexKey = $key ?? null;
+        $this->primaryKey = $key ?? null;
     }
 
     public function setSort(QuerySort $sort) : void

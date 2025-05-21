@@ -3,6 +3,7 @@
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
 use DisciteDB\Methods\QueryCondition;
+use DisciteDB\Methods\QueryMethod;
 use DisciteDB\Methods\QueryModifier;
 
 ini_set('display_errors','1');
@@ -32,13 +33,15 @@ error_reporting(E_ALL);
     $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
     $disciteDB->conf()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
 
+    $disciteDB->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
     // QUERY -- SELECT
     $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
         'name'=>QueryCondition::Not('White Widget'),
         'description'=>QueryCondition::Contains('and',QueryLocation::Between),
         'price' => QueryCondition::LessOrEqual(25),
-        QueryModifier::order(DisciteDB::SORT_DESC,'name')
+        QueryModifier::Order([DisciteDB::SORT_DESC,'name']),
+        QueryModifier::Limit(3,2),
     ]);
 
     // After that, you can show values :

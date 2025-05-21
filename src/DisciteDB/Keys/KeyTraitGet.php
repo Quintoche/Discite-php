@@ -65,7 +65,7 @@ trait KeyTraitGet
     /**
      * Retourne la table sur laquelle cette clé est indéxée (s'il s'agit d'un indexType::Index)
      *
-     * @return IndexType|null
+     * @return BaseTable|null
      */
     public function getIndexTable() : BaseTable|null
     {
