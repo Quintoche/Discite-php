@@ -11,7 +11,7 @@ error_reporting(E_ALL);
 
 
     // Create your connection
-    $_connection = new mysqli('localhost','root','','discite_remise');
+    $_connection = new mysqli('localhost','root','','test_db');
 
 
     // Initiate DisciteDB Manager

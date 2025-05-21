@@ -3,12 +3,12 @@
 namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Default\ConnectionConfig;
-use DisciteDB\Config\Default\QueryTemplateConfig;
 use DisciteDB\Config\Enums\Operators;
-use DisciteDB\Config\Enums\QueryTemplate;
 use DisciteDB\Sql\Data\DataDatabase;
+use DisciteDB\Sql\Data\DataKey;
 use DisciteDB\Sql\Data\DataTable;
 use DisciteDB\Tables\BaseTable;
+use mysqli;
 
 class HandlerStructure
 {
@@ -22,15 +22,22 @@ class HandlerStructure
 
     protected ?string $structureTable = null;
 
+    protected ?array $definedColumn = null;
+
     protected Operators $operator;
 
     protected BaseTable $table;
 
+    protected mysqli $connection;
 
-    public function __construct(BaseTable $table, Operators $operator)
+
+    public function __construct(BaseTable $table, Operators $operator, mysqli $connection, ?array $column = null)
     {
         $this->table = $table;
         $this->operator = $operator;
+        $this->connection = $connection;
+
+        $this->definedColumn = $column;
 
         $this->createStructure();
         $this->createArray();
@@ -62,15 +69,73 @@ class HandlerStructure
 
     private function getStructureColumn() : string
     {
-        return '*';
+        return implode(', ',$this->buildSqlColumns($this->definedColumn,'',0));
     }
+
+    function buildSqlColumns(array $structure, string $prefix = '', int $depth = 0): array 
+    {
+        $columns = [];
+    
+        foreach ($structure as $table => $fields) 
+        {
+            $simpleColumns = [];
+            $nestedTables = [];
+    
+            foreach ($fields as $field) 
+            {
+                if (is_array($field)) 
+                {
+                    $nestedTables[] = $field;
+                } else 
+                {
+                    $simpleColumns[] = $field;
+                }
+            }
+    
+            if ($depth === 0) 
+            {
+                foreach ($simpleColumns as $col) {
+                    $columns[] = "`$table`.`$col` AS '$col'";
+                }
+            }
+    
+            if ($depth >= 1) 
+            {
+                $jsonParts = [];
+                foreach ($simpleColumns as $col) 
+                {
+                    $jsonParts[] = "'$col', `$table`.`$col`";
+                }
+    
+                foreach ($nestedTables as $subTable) 
+                {
+                    $sub = $this->buildSqlColumns($subTable, $prefix, $depth + 1);
+                    foreach ($sub as $item) 
+                    {
+                        $jsonParts[] = "'".explode(' AS ', $item)[1]."', ".explode(' AS ', $item)[0];
+                    }
+                }
+    
+                $columns[] = "JSON_OBJECT(" . implode(', ', $jsonParts) . ") AS {$table}";
+            }
+    
+            foreach ($nestedTables as $subTable) 
+            {
+                $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
+            }
+        }
+    
+        return $columns;
+    }
+    
+
     private function getStructureColumns() : string
     {
         return match ($this->operator) {
             Operators::Count, Operators::CountAll => 'COUNT(*)',
             Operators::Sum => 'SUM({COLUMN})',
             Operators::Average => 'AVG({COLUMN})',
-            default => '*',
+            default => $this->structureColumn,
         };
     }
     private function getStructureDatabase() : string

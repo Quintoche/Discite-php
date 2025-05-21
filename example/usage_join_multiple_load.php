@@ -10,12 +10,11 @@ ini_set('display_errors','1');
 ini_set('display_startup_erros','1');
 error_reporting(E_ALL);
 
-
     require 'default_file.php';
 
 
     // Create your connection
-    $_connection = new mysqli('localhost','root','','test_db');
+    $_connection = new mysqli('localhost','root','','discite_remise');
 
 
     // Initiate DisciteDB Manager
@@ -35,14 +34,17 @@ error_reporting(E_ALL);
     $disciteDB->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
 
-    $disciteDB->loadFromDatabase();
+    $disciteDB->loadFromFile(dirname(__DIR__, 2).'/discite-php/.files/sql.cache.json',strtotime('+3 hours'));
 
 
-
+    $start = microtime(true);
     // QUERY -- SELECT
-    $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
-        'id' => QueryCondition::LessThan(60),
+    $queryFakeItems = $disciteDB->table('disc_account')->listing([
+        'token' => QueryCondition::Not('test'),
     ]);
+
+    $end = microtime(true);
+    $duration = ($end - $start) * 1000;
 
     // After that, you can show values :
 
@@ -51,7 +53,8 @@ error_reporting(E_ALL);
     echo '<pre>',var_dump($queryFakeItems->fetchQuery()),'</pre>';
     
     // You will have all data and infos
-    echo '<b>ALL DATA AND INFORMATIONS</b>';
-    echo '<pre>',var_dump($queryFakeItems->fetchArray()),'</pre>';
+    echo '<b>ALL DATA AND INFORMATIONS | Duration : '.number_format($duration, 3, '.', ' ').'ms</b>';
+    echo '<pre>',var_dump($queryFakeItems->fetchNext()),'</pre>';
+    echo '<pre>',var_dump($queryFakeItems->fetchNext()),'</pre>';
     
 ?>

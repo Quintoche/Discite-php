@@ -33,6 +33,8 @@ class QueryBuilder
 
     public function createBuild() : string
     {
+        // var_dump($this->queryHandler->returnStructure());
+        var_dump($this->query);
         $this->query = $this->searchReplace($this->query,$this->queryHandler->returnStructure());
         $this->query = $this->searchReplace($this->query,array_merge($this->associateKeys(),$this->associateValues(),$this->associateArgs(),$this->associateModifier()));
         $this->query = $this->searchReplace($this->query,$this->associateUuid());

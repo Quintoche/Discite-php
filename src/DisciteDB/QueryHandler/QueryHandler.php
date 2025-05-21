@@ -31,10 +31,10 @@ class QueryHandler
         $this->queryManager = $queryManager;
 
         $this->handleTemplate();
+        $this->handleMethods();
         $this->handleStructure();
         $this->handleArguments();
         $this->handleModifier();
-        $this->handleMethods();
         $this->handleUuid();
     }
 
@@ -88,7 +88,7 @@ class QueryHandler
     }
     private function handleStructure() : void
     {
-        $this->handlerStructure = new HandlerStructure($this->queryManager->getTable(),$this->queryManager->getOperator());
+        $this->handlerStructure = new HandlerStructure($this->queryManager->getTable(),$this->queryManager->getOperator(), $this->queryManager->getConnection(), $this->handlerMethod->retrieveForeign());
     }
     private function handleTemplate() : void
     {

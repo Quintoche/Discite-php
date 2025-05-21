@@ -6,6 +6,7 @@ use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Core\QueryManager;
 use DisciteDB\Database;
 use DisciteDB\Tables\BaseTable;
+use DisciteDB\Utilities\ValidateJson;
 use mysqli;
 use mysqli_result;
 
@@ -95,7 +96,7 @@ class ResultData extends AbstractResult implements Result
         $_uuid = match(true)
         {
             is_array($uuid) => $uuid,
-            is_int($uuid) || is_string($uuid) => [($table->getIndexKey()->getName() ?? $table->getIndexKey()->getAlias()) => $uuid],
+            is_int($uuid) || is_string($uuid) => [($table->getPrimaryKey()->getName() ?? $table->getPrimaryKey()->getAlias()) => $uuid],
             default => null,
         };
 
@@ -167,7 +168,42 @@ class ResultData extends AbstractResult implements Result
      */
     public function getResultAll(): array
     {
-        return mysqli_fetch_all($this->rawResult, MYSQLI_ASSOC);
+
+        $rows = mysqli_fetch_all($this->rawResult, MYSQLI_ASSOC);
+
+        return $this->decodeJsonFieldsRecursively($rows);
+        
+    }
+
+    private function decodeJsonFieldsRecursively(array $rows) : array
+    {
+        foreach ($rows as $key => &$row) {
+            if(is_object($row) || is_array($row))
+            {
+                foreach ($row as $key => $value) {
+                    if (is_string($value) && ValidateJson::isJson($value)) {
+                        $row[$key] = json_decode($value, true);
+        
+                        // Optional: decode sub-fields recursively too
+                        if (is_array($row[$key])) {
+                            $row[$key] = $this->decodeJsonFieldsRecursively([$row[$key]])[0];
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (is_string($row) && ValidateJson::isJson($row)) {
+                    $row = json_decode($row, true);
+    
+                    // Optional: decode sub-fields recursively too
+                    if (is_array($row)) {
+                        $row = $this->decodeJsonFieldsRecursively([$row])[0];
+                    }
+                }
+            }
+        }
+        return $rows;
     }
     
     /**
@@ -175,7 +211,9 @@ class ResultData extends AbstractResult implements Result
      */
     public function getResultNext(): ?array
     {
-        return mysqli_fetch_assoc($this->rawResult);
+        $rows = mysqli_fetch_assoc($this->rawResult);
+
+        return $this->decodeJsonFieldsRecursively($rows);
     }
 
     /**
