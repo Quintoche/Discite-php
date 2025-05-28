@@ -51,10 +51,13 @@ Only the connection must be initialized outside the library for security reasons
     - [Available Key Usage Modes](#available-key-usage-modes)  
 - [Keys (Columns)](#keys-columns)  
   - [Parameters](#parameters)  
+  - [Keys Type](#keys-type)  
+  - [Keys Index](#keys-index)  
+  - [Nullable](#nullable)  
+  - [Secure](#secure)  
+  - [Updatable](#updatable)  
+  - [Default](#default)  
   - [Creating Keys](#creating-keys)  
-- [Key Types](#key-types)  
-- [Key Index Types](#key-index-types)  
-- [Default Key Values](#default-key-values)  
 - [Query Methods](#Query-Methods)
 - [Fetching Results](#Fetching-Results)
 - [Project Structure](#Project-Structure)
@@ -212,8 +215,8 @@ $disciteDB->config()->getCharset();
     </tr>
   </thead>
   <tbody>
-    <tr><td>CHARSET_UTF8</td><td>`utf8`</td><td></td></tr>
-    <tr><td>CHARSET_UTF8MB4</td><td>`utf8mb4`</td><td>✓</td></tr>
+    <tr><td>CHARSET_UTF8</td><td>utf8</td><td></td></tr>
+    <tr><td>CHARSET_UTF8MB4</td><td>utf8mb4</td><td>✓</td></tr>
   </tbody>
 </table>
 
@@ -244,9 +247,9 @@ $disciteDB->config()->getCollation();
     </tr>
   </thead>
   <tbody>
-    <tr><td>COLLATION_UTF8_GENERAL_CI</td><td>`utf8_general_ci`</td><td></td></tr>
-    <tr><td>COLLATION_UTF8MB4_BIN</td><td>`utf8mb4_bin`</td><td></td></tr>
-    <tr><td>COLLATION_UTF8MB4_UNICODE_CI</td><td>`utf8mb4_unicode_ci`</td><td>✓</td></tr>
+    <tr><td>COLLATION_UTF8_GENERAL_CI</td><td>utf8_general_ci</td><td></td></tr>
+    <tr><td>COLLATION_UTF8MB4_BIN</td><td>utf8mb4_bin</td><td></td></tr>
+    <tr><td>COLLATION_UTF8MB4_UNICODE_CI</td><td>utf8mb4_unicode_ci</td><td>✓</td></tr>
   </tbody>
 </table>
 
@@ -254,7 +257,7 @@ $disciteDB->config()->getCollation();
 
 ### Naming Convention
 
-** Can be used only in `strict` mode **
+*Can be used only in `strict` mode*
 
 You can define the naming convention to use. The library will automatically change the names and aliases to conform to the selected convention. By default, no convention is selected.
 
@@ -337,9 +340,9 @@ $disciteDB->config()->getSort();
     </tr>
   </thead>
   <tbody>
-    <tr><td>SORT_NO_SORT</td><td>`null`</td><td>✓</td></tr>
-    <tr><td>SORT_DESC</td><td>`DESC`</td><td></td></tr>
-    <tr><td>SORT_ASC</td><td>`ASC`</td><td></td></tr>
+    <tr><td>SORT_NO_SORT</td><td>null</td><td>✓</td></tr>
+    <tr><td>SORT_DESC</td><td>DESC</td><td></td></tr>
+    <tr><td>SORT_ASC</td><td>ASC</td><td></td></tr>
   </tbody>
 </table>
 
@@ -347,7 +350,7 @@ $disciteDB->config()->getSort();
 
 ### Joining
 
-** Can be used only in `strict` mode **
+*Can be used only in `strict` mode*
 
 #### Joining Methods
 
@@ -413,10 +416,10 @@ $disciteDB->config()->getJoinSeparator();
   </thead>
   <tbody>
     <tr><td>JOIN_METHOD_NO_JOIN</td><td>no joining</td><td>✓</td></tr>
-    <tr><td>JOIN_METHOD_FLAT</td><td>joined using `INNER RIGHT` sql </td><td></td></tr>
-    <tr><td>JOIN_METHOD_CONCAT</td><td>joined using `CONCAT` sql, return in plain text</td><td></td></tr>
-    <tr><td>JOIN_METHOD_JSON</td><td>joined using `JSON_AGG` sql, return in json</td><td></td></tr>
-    <tr><td>JOIN_METHOD_MULTIDIMENSIONAL_ARRAY</td><td>joined using `JSON_AGG`, return in php array</td><td></td></tr>
+    <tr><td>JOIN_METHOD_FLAT</td><td>joined using INNER RIGHT sql </td><td></td></tr>
+    <tr><td>JOIN_METHOD_CONCAT</td><td>joined using CONCAT sql, return in plain text</td><td></td></tr>
+    <tr><td>JOIN_METHOD_JSON</td><td>joined using JSON_AGG sql, return in json</td><td></td></tr>
+    <tr><td>JOIN_METHOD_MULTIDIMENSIONAL_ARRAY</td><td>joined using JSON_AGG, return in php array</td><td></td></tr>
   </tbody>
 </table>
 
@@ -525,7 +528,291 @@ $disciteDB->keys();
 
 A key has several parameters:
 
-WIP
+| Parameter | Type | Usage | Default | Nullable ? |
+| --- | --- | --- | --- | --- |
+| `name` | `string` | Showed name as object | `` |  |
+| `alias` | `string` | Used name in database | `$name` | ✓ |
+| `prefix` | `string` | Used prefix in database | `null` | ✓ |
+| `type` | `DisciteDB::TYPE_[...]` | Used in `strict` mode [^key_type] | `DisciteDB::TYPE_STRING_STRING` | ✓ |
+| `index` | `DisciteDB::INDEX_TYPE_[...]` | Used if you want to set index [^index_type] | `DisciteDB::INDEX_TYPE_NONE` | ✓ |
+| `indexTable` | `Table` or `string` | Used if you previously set index type | `null` | ✓ |
+| `default` | `DisciteDB::DEFAULT_VALUE_[...]` or your own value [^key_default] | Used to define default value | `DisciteDB::DEFAULT_VALUE_EMPTY_STRING` | ✓ |
+| `nullable` | `bool` | Used in `strict` mode. [^key_nullable] | `false` | ✓ |
+| `secure` | `bool` | Used in `strict` mode. [^key_secure] | `false` | ✓ |
+| `updatable` | `bool` | Used in `strict` mode. [^key_updatable] | `false` | ✓ |
+
+### Keys Type
+
+[^key_type]: 
+
+You can select key type. It will be usefull while formatting values. It will escape values which aren't the same as selected type.
+
+Groups are available to help definition :
+- `Binary`[^key_binary] ;
+- `Date`[^key_date] ;
+- `String`[^key_string] ;
+- `Integer`[^key_integer] ;
+- `Float`[^key_float] .
+
+
+[^key_binary]: 
+*Binary Type*
+
+<table>
+  <thead>
+    <tr>
+      <th>Constant</th>
+      <th>Value</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TYPE_BINARY_BLOB</td>
+      <td>blob</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td>TYPE_BINARY_TINYBLOB</td>
+      <td>tinyblob</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_BINARY_MEDIUMBLOB</td>
+      <td>mediumblob</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_BINARY_LONGBLOB</td>
+      <td>longblob</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_BINARY_JSON</td>
+      <td>json</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_BINARY_FILE</td>
+      <td>file</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+[^key_date]: 
+*Date Type*
+
+<table>
+  <thead>
+    <tr>
+      <th>Constant</th>
+      <th>Value</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TYPE_DATE_DATE</td>
+      <td>date</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td>TYPE_DATE_TIME</td>
+      <td>time</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_DATE_DATETIME</td>
+      <td>datetime</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_DATE_TIMESTAMP</td>
+      <td>timestamp</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_DATE_YEAR</td>
+      <td>year</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+[^key_string]: 
+*String Type*
+
+<table>
+  <thead>
+    <tr>
+      <th>Constant</th>
+      <th>Value</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TYPE_STRING_STRING</td>
+      <td>string</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_SMALLTEXT</td>
+      <td>smalltext</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_MEDIUMTEXT</td>
+      <td>mediumtext</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_LONGTEXT</td>
+      <td>longtext</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_UUID</td>
+      <td>uuid</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_EMAIL</td>
+      <td>email</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_URL</td>
+      <td>url</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_IP</td>
+      <td>ip</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_USERNAME</td>
+      <td>username</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_STRING_PASSWORD</td>
+      <td>password</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+[^key_integer]: 
+*Integer Type*
+
+<table>
+  <thead>
+    <tr>
+      <th>Constant</th>
+      <th>Value</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TYPE_INTEGER_BOOLEAN</td>
+      <td>boolean</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_INT</td>
+      <td>int</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_BIGINT</td>
+      <td>bigint</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_TINYINT</td>
+      <td>tinyint</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_MEDIUMINT</td>
+      <td>mediumint</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_SMALLINT</td>
+      <td>smallint</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_INTEGER_UNIXTIME</td>
+      <td>unixtime</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+[^key_float]: 
+*Float Type*
+
+<table>
+  <thead>
+    <tr>
+      <th>Constant</th>
+      <th>Value</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TYPE_FLOAT_FLOAT</td>
+      <td>float</td>
+      <td>✓</td>
+    </tr>
+    <tr>
+      <td>TYPE_FLOAT_DOUBLE</td>
+      <td>double</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>TYPE_FLOAT_DECIMAL</td>
+      <td>decimal</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+### Keys Index
+
+[^index_type]: 
+
+You can select key type. It will be usefull while formatting values. It will escape values which aren't the same as selected type.
+
+### Nullable
+
+[^key_nullable]: 
+
+
+
+### Secure
+
+[^key_secure]: 
+
+
+### Updatable
+
+[^key_updatable]: 
+
+
+### Default
+
+[^key_default]: 
+
+
+
 
 ### Creating Keys
 
@@ -545,24 +832,6 @@ or
 ```php
 $disciteDB->keys()->add();
 ```
-
----
-
-## Key Types
-
-WIP - documentation
-
----
-
-## Key Index Types
-
-WIP - documentation
-
----
-
-## Default Key Values
-
-WIP - documentation
 
 ---
 
@@ -616,3 +885,5 @@ QueryMethod::IsNotNull();
 ## License
 
 MIT License — see `LICENSE` file.
+
+Created by Romain QUINTAINE.
