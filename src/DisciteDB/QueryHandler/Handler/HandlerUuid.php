@@ -3,9 +3,9 @@
 namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\QueryOperator;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Sql\Data\DataKey;
-use mysqli;
 
 class HandlerUuid
 {
@@ -17,14 +17,15 @@ class HandlerUuid
 
     protected ?array $argumentArguments;
 
-    protected mysqli $connection;
+    protected QueryManager $queryManager;
     
     protected ?array $args;
 
-    public function __construct(array $args, mysqli $connection)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->args = $args;
-        $this->connection = $connection;
+        $this->queryManager = $queryManager;
+
+        $this->args = $this->queryManager->getUuid();
 
         $this->createArgs();
     }
@@ -59,7 +60,7 @@ class HandlerUuid
     }
     private function createArgsKeys(string $key) : string
     {
-        return DataKey::escape($key, $this->connection);
+        return DataKey::escape($key, $this->queryManager->getConnection());
     }
     private function createArgsValues(mixed $value) : QueryConditionExpression
     {
@@ -67,7 +68,7 @@ class HandlerUuid
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->queryManager->getConnection()) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->queryManager->getConnection());
     }
 }
 

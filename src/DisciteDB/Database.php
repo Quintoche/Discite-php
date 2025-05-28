@@ -11,11 +11,14 @@ use DisciteDB\Core\SecurityManager;
 use DisciteDB\Core\TablesManager;
 use DisciteDB\Core\UsersManager;
 use DisciteDB\Exceptions\TableException;
+use DisciteDB\Keys\BaseKey;
 use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Sql\Loading\Handler;
 use DisciteDB\Sql\Loading\HandlerDatabase;
 use DisciteDB\Sql\Loading\HandlerFile;
+use DisciteDB\Tables\BaseTable;
 use DisciteDB\Tables\TableInterface;
+use DisciteDB\Users\BaseUser;
 use mysqli;
 
 /**
@@ -75,7 +78,6 @@ class Database
      * @var DebugManager Debug manager instance.
      */
     protected DebugManager $debugManager;
-
 
     /**
      * Database constructor.

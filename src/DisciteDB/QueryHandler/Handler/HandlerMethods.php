@@ -5,20 +5,15 @@ namespace DisciteDB\QueryHandler\Handler;
 use DisciteDB\Config\Enums\IndexType;
 use DisciteDB\Config\Enums\KeyUsage;
 use DisciteDB\Config\Enums\TableUsage;
-use DisciteDB\Database;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Sql\Clause\ClauseTable;
 use DisciteDB\Sql\Data\DataKey;
 use DisciteDB\Sql\Data\DataTable;
 use DisciteDB\Tables\BaseTable;
-use mysqli;
 
 class HandlerMethods
 {
-    protected BaseTable $table;
-
-    protected Database $database;
-
-    protected mysqli $connection;
+    protected QueryManager $queryManager;
 
     protected ?array $argumentArray;
 
@@ -32,29 +27,25 @@ class HandlerMethods
 
     protected ?array $currentKey;
 
-    protected ?array $multiArray;
+    protected ?array $multiArray = [];
     
-    public function __construct(BaseTable $table, Database $database, mysqli $connection)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->table = $table;
+        $this->queryManager = $queryManager;
 
-        $this->database = $database;
+        if(!$this->tableHasIndexKey($this->queryManager->getTable())) return;
 
-        $this->connection = $connection;
+        $this->indexKey = $this->getIndexKey($this->queryManager->getTable());
 
-        if(!$this->tableHasIndexKey($this->table)) return;
-
-        $this->indexKey = $this->getIndexKey($this->table);
-
-        $this->multiArray = $this->getForeign($this->indexKey, $this->table);
+        $this->multiArray = $this->getForeign($this->indexKey, $this->queryManager->getTable());
 
         $this->createArgs();
     }
 
     public function retrieve() : ?array
     {
-        if ($this->database->config()->getTableUsage() == TableUsage::LooseUsage) return [];
-        if ($this->database->config()->getKeyUsage() == KeyUsage::LooseUsage) return [];
+        if ($this->queryManager->getInstance()->config()->getTableUsage() == TableUsage::LooseUsage) return [];
+        if ($this->queryManager->getInstance()->config()->getKeyUsage() == KeyUsage::LooseUsage) return [];
 
         return $this->argumentArray ?? ['COUNT' => 0];
     }
@@ -66,12 +57,12 @@ class HandlerMethods
 
     private function tableHasIndexKey(BaseTable $table) : bool
     {
-        return ClauseTable::hasIndexKey($table,$this->database);
+        return ClauseTable::hasIndexKey($table,$this->queryManager->getInstance());
     }
 
     private function getIndexKey(BaseTable $table) : ?array
     {
-        return ClauseTable::getIndexKey($table,$this->database);
+        return ClauseTable::getIndexKey($table,$this->queryManager->getInstance());
     }
 
     private function getForeign(array $indexKeys, BaseTable $table) : array
@@ -117,13 +108,13 @@ class HandlerMethods
     
     private function escapeKey(string $key) : string
     {
-        return DataKey::escape($key,$this->connection);
+        return DataKey::escape($key,$this->queryManager->getConnection());
     }
     
     private function escapeTable(?string $table) : ?string
     {
         if(!$table) return null;
-        return DataTable::escape($table,$this->connection);
+        return DataTable::escape($table,$this->queryManager->getConnection());
     }
 
     private function createArgs()

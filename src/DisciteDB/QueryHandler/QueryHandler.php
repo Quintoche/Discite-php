@@ -71,28 +71,28 @@ class QueryHandler
     private function handleUuid() : void
     {
         if($this->queryManager->getUuid() === null) return;
-        $this->handlerUuid = new HandlerUuid($this->queryManager->getUuid(),$this->queryManager->getConnection());
+        $this->handlerUuid = new HandlerUuid($this->queryManager);
     }
 
     private function handleArguments() : void
     {
-        $this->handlerArguments = new HandlerArgument($this->queryManager->getArgs(),$this->queryManager->getOperator(),$this->queryManager->getConnection());
+        $this->handlerArguments = new HandlerArgument($this->queryManager);
     }
     private function handleMethods() : void
     {
-        $this->handlerMethod = new HandlerMethods($this->queryManager->getTable(),$this->queryManager->getInstance(), $this->queryManager->getConnection());
+        $this->handlerMethod = new HandlerMethods($this->queryManager);
     }
     private function handleModifier() : void
     {
-        $this->handlerModifier = new HandlerModifier($this->queryManager->getArgs(), $this->queryManager->getConnection());
+        $this->handlerModifier = new HandlerModifier($this->queryManager);
     }
     private function handleStructure() : void
     {
-        $this->handlerStructure = new HandlerStructure($this->queryManager->getTable(),$this->queryManager->getOperator(), $this->queryManager->getConnection(), $this->handlerMethod->retrieveForeign());
+        $this->handlerStructure = new HandlerStructure($this->queryManager, $this->handlerMethod->retrieveForeign());
     }
     private function handleTemplate() : void
     {
-        $this->handlerTemplate = new HandlerTemplate($this->queryManager->getOperator(),$this->queryManager->getInstance());
+        $this->handlerTemplate = new HandlerTemplate($this->queryManager);
     }
 
 

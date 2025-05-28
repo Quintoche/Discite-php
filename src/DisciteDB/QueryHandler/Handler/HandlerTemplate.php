@@ -4,13 +4,12 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Default\QueryStructureConfig;
 use DisciteDB\Config\Default\QueryTemplateConfig;
-use DisciteDB\Config\Default\QueryTypeConfig;
 use DisciteDB\Config\Enums\KeyUsage;
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Config\Enums\QueryStructure;
 use DisciteDB\Config\Enums\QueryTemplate;
 use DisciteDB\Config\Enums\TableUsage;
-use DisciteDB\Database;
+use DisciteDB\Core\QueryManager;
 
 class HandlerTemplate
 {
@@ -26,17 +25,14 @@ class HandlerTemplate
 
     protected ?string $templateConditions = null;
 
-    protected Operators $operator;
-
-    protected Database $database;
+    protected QueryManager $queryManager;
 
     protected QueryTemplate $queryTemplate;
 
 
-    public function __construct(Operators $operator, Database $database)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->operator = $operator;
-        $this->database = $database;
+        $this->queryManager = $queryManager;
 
         $this->createTemplate();
         $this->createArray();
@@ -49,7 +45,7 @@ class HandlerTemplate
 
     private function selectTemplate() : QueryTemplate
     {
-        return match ($this->operator) {
+        return match ($this->queryManager->getOperator()) {
             Operators::All, Operators::CountAll => QueryTemplate::SelectAll,
             Operators::Compare => QueryTemplate::Select,
             Operators::Count => QueryTemplate::Select,
@@ -99,7 +95,7 @@ class HandlerTemplate
     }
     private function getTemplateMethods() : ?string
     {
-        if($this->database->config()->getTableUsage() == TableUsage::LooseUsage || $this->database->config()->getKeyUsage() == KeyUsage::LooseUsage) return null;
+        if($this->queryManager->getInstance()->config()->getTableUsage() == TableUsage::LooseUsage || $this->queryManager->getInstance()->config()->getKeyUsage() == KeyUsage::LooseUsage) return null;
         return QueryStructureConfig::$MAP[QueryStructure::Methods->name][$this->queryTemplate->name] ?? null;
     }
     private function getTemplateConditions() : ?string

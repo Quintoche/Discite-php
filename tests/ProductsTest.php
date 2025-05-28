@@ -10,7 +10,7 @@ use DisciteDB\Methods\QueryCondition;
     require dirname(__DIR__, 2).'/discite-php/vendor/autoload.php';
 
 
-        $connection = mysqli_connect('localhost','root','','gfis_boutique');
+        
         // $database = new \DisciteDB\Database($connection);
 
         // $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
@@ -65,13 +65,48 @@ use DisciteDB\Methods\QueryCondition;
 // }
 
 // Connexion via ta librairie
-$database = new \DisciteDB\Database($connection);
 
-$database->config()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
-    $database->config()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
+function measureMemory(callable $callback, int $iterations = 1): void
+{
+    gc_collect_cycles(); // Forcer le ramassage des cycles
+    $startMemory = memory_get_usage(true);
+
+    $objects = [];
+    for ($i = 0; $i < $iterations; $i++) {
+        $objects[] = $callback();
+    }
+
+    gc_collect_cycles(); // Nettoyage mémoire
+    $endMemory = memory_get_usage(true);
+
+    $total = $endMemory - $startMemory;
+    $average = $total / $iterations;
+
+    echo "Mémoire utilisée :\n";
+    echo " - Total : " . number_format($total / 1024, 2) . " Ko\n";
+    echo " - Par instance : " . number_format($average / 1024, 2) . " Ko\n";
+}
+
+// 🧪 Exemple : mesurer l'impact d'une classe DisciteQuery
+measureMemory(function () {
+    $connection = mysqli_connect('localhost','root','','discite_remise');
+    $database = new \DisciteDB\Database($connection);
+    $tableName = 'disc_account';
+
+    $database->loadFromFile(dirname(__DIR__, 2).'/discite-php/.files/sql.cache.json',0);
+
+    $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
+    $database->config()->setKeyusage(DisciteDB::KEY_USAGE_STRICT);
     $database->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
-$tableName = 'gfis_admn_mouvements';
+    return $database->table($tableName)->listing(['user-name'=>QueryCondition::Not('test')]);
+
+}, 100); // nombre d’instances à créer
+
+
+
+
+
 $iterations = 5000;
 
 // Utils
@@ -84,83 +119,83 @@ function average(array $values): float {
 }
 
 // Benchmark mysqli brut
-$rawTimes = [];
+// $rawTimes = [];
 
-for ($i = 0; $i < $iterations; $i++) {
-    $start = microtime(true);
-    $result = $connection->query("SELECT * FROM `$tableName`");
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-    $end = microtime(true);
-    $rawTimes[] = ms($start, $end);
-}
+// for ($i = 0; $i < $iterations; $i++) {
+//     $start = microtime(true);
+//     $result = $connection->query("SELECT * FROM `$tableName`");
+//     $data = $result->fetch_all(MYSQLI_ASSOC);
+//     $end = microtime(true);
+//     $rawTimes[] = ms($start, $end);
+// }
 
-// Benchmark DisciteDB
-$libTimes = [];
+// // Benchmark DisciteDB
+// $libTimes = [];
 
-for ($i = 0; $i < $iterations; $i++) {
-    $start = microtime(true);
-    $data = $database->table($tableName)->all()->fetchArray(); // ou $db->$tableName->all();
-    $end = microtime(true);
-    $libTimes[] = ms($start, $end);
-}
+// for ($i = 0; $i < $iterations; $i++) {
+//     $start = microtime(true);
+//     $data = $database->table($tableName)->all()->fetchArray(); // ou $db->$tableName->all();
+//     $end = microtime(true);
+//     $libTimes[] = ms($start, $end);
+// }
 
-// Résultat
-echo "=== Résultats après $iterations itérations ===\n\n<br/>";
-echo "=== LOOSE MODE ===\n\n<br/>";
-echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
-echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
-
-
-
-echo '<br/><br/><br/><br/>';
-
-$database->config()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
-    $database->config()->setKeyusage(DisciteDB::KEY_USAGE_STRICT);
-
-    $database->tables()->add($tableName,$tableName);
-
-    $key_mvt_id = $database->keys()->create('mouvement_id',['type'=>DisciteDB::TYPE_INTEGER_BIGINT]);
-
-    $database->tables()->appendKey($tableName,$key_mvt_id);
-
-
-// Benchmark mysqli brut
-$rawTimes = [];
-
-for ($i = 0; $i < $iterations; $i++) {
-    $start = microtime(true);
-
-    $result = $connection->query("SELECT * FROM `$tableName` WHERE `mouvement_id` != 9999 ");
-    $data = $result->fetch_all(MYSQLI_ASSOC);
-
-
-    $end = microtime(true);
-    $rawTimes[] = ms($start, $end);
-}
-
-// Benchmark DisciteDB
-$libTimes = [];
-
-for ($i = 0; $i < $iterations; $i++) {
-    $start = microtime(true);
-
-
-    $data = $database->table($tableName)->listing(
-        ['mouvement_id'=>QueryCondition::Not(9999)]
-        )->fetchArray(); // ou $db->$tableName->all();
+// // Résultat
+// echo "=== Résultats après $iterations itérations ===\n\n<br/>";
+// echo "=== LOOSE MODE ===\n\n<br/>";
+// echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
+// echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
 
 
 
-    $end = microtime(true);
-    $libTimes[] = ms($start, $end);
-}
+// echo '<br/><br/><br/><br/>';
+
+// $database->config()->setTableUsage(DisciteDB::TABLE_USAGE_STRICT);
+//     $database->config()->setKeyusage(DisciteDB::KEY_USAGE_STRICT);
+
+//     $database->tables()->add($tableName,$tableName);
+
+//     $key_mvt_id = $database->keys()->create('mouvement_id',['type'=>DisciteDB::TYPE_INTEGER_BIGINT]);
+
+//     $database->tables()->appendKey($tableName,$key_mvt_id);
 
 
-// Résultat
-echo "=== Résultats après $iterations itérations ===\n\n<br/>";
-echo "=== STRICT MODE ===\n\n<br/>";
-echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
-echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
+// // Benchmark mysqli brut
+// $rawTimes = [];
+
+// for ($i = 0; $i < $iterations; $i++) {
+//     $start = microtime(true);
+
+//     $result = $connection->query("SELECT * FROM `$tableName` WHERE `mouvement_id` != 9999 ");
+//     $data = $result->fetch_all(MYSQLI_ASSOC);
+
+
+//     $end = microtime(true);
+//     $rawTimes[] = ms($start, $end);
+// }
+
+// // Benchmark DisciteDB
+// $libTimes = [];
+
+// for ($i = 0; $i < $iterations; $i++) {
+//     $start = microtime(true);
+
+
+//     $data = $database->table($tableName)->listing(
+//         ['mouvement_id'=>QueryCondition::Not(9999)]
+//         )->fetchArray(); // ou $db->$tableName->all();
+
+
+
+//     $end = microtime(true);
+//     $libTimes[] = ms($start, $end);
+// }
+
+
+// // Résultat
+// echo "=== Résultats après $iterations itérations ===\n\n<br/>";
+// echo "=== STRICT MODE ===\n\n<br/>";
+// echo "[mysqli]    Moyenne : " . average($rawTimes) . " ms\n<br/>";
+// echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
 
         // $database->accounter->update(['id'=>3],['token'=>QueryMethod::Contains('discite',QueryLocation::Between),'datecreated'=>'2024-09-22']);
         // print_r(($database->gfis_admn_mouvements->all())->fetchArray());
@@ -173,7 +208,7 @@ echo "[Discite-PHP] Moyenne : " . average($libTimes) . " ms\n<br/>";
     
     // var_dump(FieldValidator::validate($database->keys()->create('test_longText',['type'=>TypeString::LongText,'default'=>null,'nullable'=>true,'secure'=>false,'updatable'=>false]),Operators::Listing, QueryMethod::Or('yes','no','maybe')));
     // TypeManager::checkType('LongText',TypeString::String);
-    $database->keys()->create('password',[]);
+    // $database->keys()->create('password',[]);
 
     // echo '<pre>',var_dump($database->keys()->test_longText->getAll()),'</pre>';
     // echo '<pre>',var_dump($database->keys()->password->getAll()),'</pre>';

@@ -22,18 +22,12 @@ class ResultData extends AbstractResult implements Result
 
     protected mixed $resultRows;
 
-    protected mysqli $connection;
-
-    protected Operators $operator;
-
-    protected Database $database;
+    protected QueryManager $queryManager;
     
-    public function __construct(string $query, mysqli $connection, Operators $operator, Database $database)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->query = $query;
-        $this->connection = $connection;
-        $this->operator = $operator;
-        $this->database = $database;
+        $this->queryManager = $queryManager;
+        $this->query = $this->queryManager->getQueryBuilder()->createBuild();
 
         $this->executeQuery();
         $this->processResult();
@@ -53,7 +47,7 @@ class ResultData extends AbstractResult implements Result
     {
         try 
         {
-            $this->rawResult = @mysqli_query($this->connection, $this->query);
+            $this->rawResult = @mysqli_query($this->queryManager->getConnection(), $this->query);
         } 
         catch (\Exception $e) 
         {
@@ -102,9 +96,9 @@ class ResultData extends AbstractResult implements Result
 
         if(!$_uuid) return;
 
-        $_manager = new QueryManager($this->database);
+        $_manager = new QueryManager($this->queryManager->getInstance());
         $_manager->setTable($table);
-        $_manager->setConnection($this->connection);
+        $_manager->setConnection($this->queryManager->getConnection());
         $_manager->setOperator(Operators::Retrieve);
         $_manager->setArgs([]);
         $_manager->setUuid($_uuid);
@@ -117,7 +111,7 @@ class ResultData extends AbstractResult implements Result
      */
     private function handleSuccess() : void
     {
-        $this->resultData = match ($this->operator) {
+        $this->resultData = match ($this->queryManager->getOperator()) {
             Operators::CountAll => array_values(mysqli_fetch_row($this->rawResult))[0],
             default => null,
         };
@@ -128,7 +122,7 @@ class ResultData extends AbstractResult implements Result
      */
     private function handleSuccessNoResult() : void
     {
-        $this->resultData = match ($this->operator) {
+        $this->resultData = match ($this->queryManager->getOperator()) {
             Operators::Delete => ['deleted' => true],
             default => [],
         };
@@ -141,8 +135,8 @@ class ResultData extends AbstractResult implements Result
     {
         $this->resultData = [];
         $this->resultRows = 0;
-        $this->exceptionText = mysqli_error($this->connection);
-        $this->exceptionCode = mysqli_errno($this->connection);
+        $this->exceptionText = mysqli_error($this->queryManager->getConnection());
+        $this->exceptionCode = mysqli_errno($this->queryManager->getConnection());
     }
 
     

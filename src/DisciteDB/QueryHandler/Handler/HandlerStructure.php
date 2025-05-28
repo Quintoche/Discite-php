@@ -4,11 +4,9 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Default\ConnectionConfig;
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Sql\Data\DataDatabase;
-use DisciteDB\Sql\Data\DataKey;
 use DisciteDB\Sql\Data\DataTable;
-use DisciteDB\Tables\BaseTable;
-use mysqli;
 
 class HandlerStructure
 {
@@ -24,19 +22,12 @@ class HandlerStructure
 
     protected ?array $definedColumn = null;
 
-    protected Operators $operator;
-
-    protected BaseTable $table;
-
-    protected mysqli $connection;
+    protected QueryManager $queryManager;
 
 
-    public function __construct(BaseTable $table, Operators $operator, mysqli $connection, ?array $column = null)
+    public function __construct(QueryManager $queryManager, ?array $column = null)
     {
-        $this->table = $table;
-        $this->operator = $operator;
-        $this->connection = $connection;
-
+        $this->queryManager = $queryManager;
         $this->definedColumn = $column;
 
         $this->createStructure();
@@ -131,7 +122,7 @@ class HandlerStructure
 
     private function getStructureColumns() : string
     {
-        return match ($this->operator) {
+        return match ($this->queryManager->getOperator()) {
             Operators::Count, Operators::CountAll => 'COUNT(*)',
             Operators::Sum => 'SUM({COLUMN})',
             Operators::Average => 'AVG({COLUMN})',
@@ -144,7 +135,7 @@ class HandlerStructure
     }
     private function getStructureTable() : string
     {
-        return DataTable::escape($this->table->getName()) ?? DataTable::escape($this->table->getAlias());
+        return DataTable::escape($this->queryManager->getTable()->getName()) ?? DataTable::escape($this->queryManager->getTable()->getAlias());
     }
 }
 

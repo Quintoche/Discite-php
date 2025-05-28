@@ -2,8 +2,8 @@
 
 namespace DisciteDB\QueryHandler\Handler;
 
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryModifierExpression;
-use mysqli;
 
 class HandlerModifier
 {
@@ -11,14 +11,14 @@ class HandlerModifier
 
     protected ?array $argumentArguments;
 
-    protected mysqli $connection;
+    protected QueryManager $queryManager;
     
     protected ?array $args;
 
-    public function __construct(array $args, mysqli $connection)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->args = $this->escapeArgs($args);
-        $this->connection = $connection;
+        $this->queryManager = $queryManager;
+        $this->args = $this->escapeArgs($this->queryManager->getArgs());
 
         $this->createArgs();
     }
@@ -64,7 +64,7 @@ class HandlerModifier
 
     private function createArgsArguments(mixed $value) : ?string
     {
-        return ($value instanceof QueryModifierExpression) ? $value->returnSql($this->connection) : null;
+        return ($value instanceof QueryModifierExpression) ? $value->returnSql($this->queryManager->getConnection()) : null;
     }
 }
 

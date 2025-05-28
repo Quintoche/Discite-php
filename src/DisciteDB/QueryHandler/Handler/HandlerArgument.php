@@ -4,10 +4,10 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Config\Enums\QueryOperator;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Methods\QueryModifierExpression;
 use DisciteDB\Sql\Data\DataKey;
-use mysqli;
 
 class HandlerArgument
 {
@@ -19,17 +19,17 @@ class HandlerArgument
 
     protected ?array $argumentArguments;
 
-    protected mysqli $connection;
+    protected QueryManager $queryManager;
 
     protected Operators $operator;
     
     protected ?array $args;
 
-    public function __construct(array $args, Operators $operator ,mysqli $connection)
+    public function __construct(QueryManager $queryManager)
     {
-        $this->args = $this->escapeArgs($args);
-        $this->connection = $connection;
-        $this->operator = $operator;
+        $this->queryManager = $queryManager;
+
+        $this->args = $this->escapeArgs($this->queryManager->getArgs());
 
         $this->createArgs();
     }
@@ -78,22 +78,22 @@ class HandlerArgument
     }
     private function createArgsSeparator()
     {
-        return match ($this->operator) {
+        return match ($this->queryManager->getOperator()) {
             Operators::Update => ', ',
             default => ' AND ',
         };
     }
     private function createArgsKeys(string $key) : string
     {
-        return DataKey::escape($key, $this->connection);
+        return DataKey::escape($key, $this->queryManager->getConnection());
     }
     private function createArgsValues(mixed $value) : string
     {
-        return ($value instanceof QueryConditionExpression) ? $value->returnValue($this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnValue($this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnValue($this->queryManager->getConnection()) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnValue($this->queryManager->getConnection());
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
-        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->connection) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->connection);
+        return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->queryManager->getConnection()) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->queryManager->getConnection());
     }
 }
 

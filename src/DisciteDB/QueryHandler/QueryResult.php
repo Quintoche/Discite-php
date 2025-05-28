@@ -69,13 +69,12 @@ class QueryResult
 
     private function performResultData() : ResultData
     {
-        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator(),$this->queryManager->getInstance());
+        return new ResultData($this->queryManager);
     }
     
     private function performResultAsync() : ResultData
     {
-        // $this->queryManager->getInstance()->security()
-        return new ResultData($this->queryManager->getQueryBuilder()->createBuild(),$this->queryManager->getConnection(),$this->queryManager->getOperator(),$this->queryManager->getInstance());
+        return new ResultData($this->queryManager);
     }
 
     private function handleOtherResultData()
