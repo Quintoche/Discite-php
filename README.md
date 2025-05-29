@@ -70,7 +70,7 @@ Only the connection must be initialized outside the library for security reasons
 Install with Composer:
 
 ```bash
-composer require dscite/discite-php
+composer require discite/discite-php
 ```
 
 ---
