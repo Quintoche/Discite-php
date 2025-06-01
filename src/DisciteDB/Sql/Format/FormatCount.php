@@ -6,9 +6,9 @@ use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Database;
 use DisciteDB\Sql\Clause\ClauseArgument;
 
-class FormatListing
+class FormatCount
 {
-    protected Operators $operator = Operators::Listing;
+    protected Operators $operator = Operators::Count;
 
     protected Database $database;
 
@@ -50,7 +50,6 @@ class FormatListing
                 $this->arrayUnset($k); 
                 continue;
             }
-
             $_array[$k] = $this->argsValidArgumentGenerator($k);
         }
 

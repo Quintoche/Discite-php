@@ -6,9 +6,9 @@ use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Database;
 use DisciteDB\Sql\Clause\ClauseArgument;
 
-class FormatListing
+class FormatDelete
 {
-    protected Operators $operator = Operators::Listing;
+    protected Operators $operator = Operators::Delete;
 
     protected Database $database;
 

@@ -41,9 +41,17 @@ class FormatAll
 
         foreach($this->args as $k => $v)
         {
-            if($this->argsInstanceCheck($v)) $_array[$k] = $v; continue;
-
-            if(!$this->argsValidArgumentCheck($k, $v)) $this->arrayUnset($k); continue;
+            if($this->argsInstanceCheck($v)) 
+            {
+                $_array[$k] = $v;
+                continue;
+            }
+            
+            if(!$this->argsValidArgumentCheck($k, $v))
+            {
+                $this->arrayUnset($k); 
+                continue;
+            }
 
             $_array[$k] = $this->argsValidArgumentGenerator($k);
         }

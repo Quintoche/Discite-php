@@ -16,7 +16,7 @@ trait Delete
         }
         else
         {
-            $uuidKey = $this->getIndexKey()->getName() ?? 'id';
+            $uuidKey = $this->getPrimaryKey()->getName() ?? 'id';
             $uuidValue = $uuid;
         }
 

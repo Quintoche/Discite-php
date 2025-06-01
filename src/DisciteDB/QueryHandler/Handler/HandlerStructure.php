@@ -115,6 +115,8 @@ class HandlerStructure
                 $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
             }
         }
+
+        if(empty($columns)) $columns[] = '*';
     
         return $columns;
     }
