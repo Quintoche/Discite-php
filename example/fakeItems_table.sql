@@ -28,7 +28,6 @@ CREATE TABLE disciteDB_FakeItemSuppliers (
     item_id INT NOT NULL,
     supplier_id INT NOT NULL,
     PRIMARY KEY (item_id, supplier_id),
-    FOREIGN KEY (item_id) REFERENCES disciteDB_FakeItems(id),
     FOREIGN KEY (supplier_id) REFERENCES disciteDB_FakeSuppliers(id)
 );
 

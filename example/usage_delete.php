@@ -34,7 +34,7 @@ error_reporting(E_ALL);
 
     // QUERY -- CHECK PREVIOUS VALUE
     echo '<br/><br/><br/><br/><b>PREVIOUS VALUE</b>';
-    echo '<pre>',var_dump($disciteDB->table('disciteDB_FakeItems')->retrieve(4)->fetch()),'</pre>';
+    echo '<pre>',var_dump($disciteDB->table('disciteDB_FakeItems')->retrieve(4)->fetchArray()),'</pre>';
 
 
     // QUERY -- DELETE
