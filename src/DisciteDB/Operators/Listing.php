@@ -16,7 +16,7 @@ trait Listing
         $this->query->setOperator(Operators::Listing);
         $this->query->setArgs($args);
 
-        if(ClauseMethod::hasQueryMethod($args)) echo '<pre>',var_dump((new ClauseMethod($this, Operators::Listing, $this->query->getConnection(), $this->query->getInstance(), $args))->makeQuery()),'</pre>';
+        // if(ClauseMethod::hasQueryMethod($args)) echo '<pre>',var_dump((new ClauseMethod($this, Operators::Listing, $this->query->getConnection(), $this->query->getInstance(), $args))->makeQuery()),'</pre>';
 
         return $this->query->makeQuery();
     }
