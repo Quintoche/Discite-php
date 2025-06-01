@@ -53,12 +53,43 @@ Only the connection must be initialized outside the library for security reasons
   - [Parameters](#parameters)  
   - [Keys Type](#keys-type)  
   - [Keys Index](#keys-index)  
+    - [Column Index](#Column-index)  
+    - [Table Index](#Table-index)  
   - [Nullable](#nullable)  
   - [Secure](#secure)  
   - [Updatable](#updatable)  
   - [Default](#default)  
   - [Creating Keys](#creating-keys)  
-- [Query Methods](#Query-Methods)
+- [Tables](#tables)  
+  - [Table Parameters](#Table-parameters)  
+- [Query Operators](#Query-Operators)
+  - [All Operator](#All-Operator)
+  - [Count Operator](#Count-Operator)
+  - [Listing Operator](#Listing-Operator)
+  - [Retrieve Operator](#Retrieve-Operator)
+  - [Update Operator](#Update-Operator)
+  - [Delete Operator](#Delete-Operator)
+  - [Create Operator](#Create-Operator)
+- [Manipulate Queries](#Manipulate-Queries)
+  - [Query Conditions](#Query-Conditions)
+    - [Equal Condition](#Equal-Condition)
+    - [Or Condition](#Or-Condition)
+    - [Contains Condition](#Contains-Condition)
+    - [Between Condition](#Between-Condition)
+    - [Not Condition](#Not-Condition)
+    - [NotIn Condition](#NotIn-Condition)
+    - [NotContains Condition](#NotContains-Condition)
+    - [Like Condition](#Like-Condition)
+    - [NotLike Condition](#NotLike-Condition)
+    - [NotBetween Condition](#NotBetween-Condition)
+    - [MoreThan Condition](#MoreThan-Condition)
+    - [LessThan Condition](#LessThan-Condition)
+    - [MoreOrEqual Condition](#MoreOrEqual-Condition)
+    - [LessOrEqual Condition](#LessOrEqual-Condition)
+  - [Query Modifiers](#Query-Modifiers)
+    - [Order Modifier](#Order-Modifier)
+    - [Sort Modifier](#Sort-Modifier)
+    - [Limit Modifier](#Limit-Modifier)
 - [Fetching Results](#Fetching-Results)
 - [Project Structure](#Project-Structure)
 - [License](#License)
@@ -83,7 +114,7 @@ This snippet demonstrates how to initialize DisciteDB, configure it, and run a `
 ```php
 use DisciteDB\Config\Enums\QueryLocation;
 use DisciteDB\DisciteDB;
-use DisciteDB\Methods\QueryMethod;
+use DisciteDB\Methods\QueryCondition;
 
 ini_set('display_errors','1');
 ini_set('display_startup_errors','1');
@@ -100,9 +131,9 @@ $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
 $disciteDB->conf()->setKeyUsage(DisciteDB::KEY_USAGE_LOOSE);
 
 $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
-    'name'=>QueryMethod::Not('White Widget'),
-    'description'=>QueryMethod::Contains('and', QueryLocation::Between),
-    'price' => QueryMethod::LessOrEqual(25),
+    'name'=>QueryCondition::Not('White Widget'),
+    'description'=>QueryCondition::Contains('and', QueryLocation::Between),
+    'price' => QueryCondition::LessOrEqual(25),
 ]);
 
 echo '<b>QUERY</b>';
@@ -533,29 +564,29 @@ A key has several parameters:
 | `name` | `string` | Showed name as object | `` |  |
 | `alias` | `string` | Used name in database | `$name` | ✓ |
 | `prefix` | `string` | Used prefix in database | `null` | ✓ |
-| `type` | `DisciteDB::TYPE_[...]` | Used in `strict` mode [^key_type] | `DisciteDB::TYPE_STRING_STRING` | ✓ |
-| `index` | `DisciteDB::INDEX_TYPE_[...]` | Used if you want to set index [^index_type] | `DisciteDB::INDEX_TYPE_NONE` | ✓ |
+| `type` | `DisciteDB::TYPE_[...]` | Used in `strict` mode [^1] | `DisciteDB::TYPE_STRING_STRING` | ✓ |
+| `index` | `DisciteDB::INDEX_TYPE_[...]` | Used if you want to set index [^2] | `DisciteDB::INDEX_TYPE_NONE` | ✓ |
 | `indexTable` | `Table` or `string` | Used if you previously set index type | `null` | ✓ |
-| `default` | `DisciteDB::DEFAULT_VALUE_[...]` or your own value [^key_default] | Used to define default value | `DisciteDB::DEFAULT_VALUE_EMPTY_STRING` | ✓ |
-| `nullable` | `bool` | Used in `strict` mode. [^key_nullable] | `false` | ✓ |
-| `secure` | `bool` | Used in `strict` mode. [^key_secure] | `false` | ✓ |
-| `updatable` | `bool` | Used in `strict` mode. [^key_updatable] | `false` | ✓ |
+| `default` | `DisciteDB::DEFAULT_VALUE_[...]` or your own value [^6] | Used to define default value | `DisciteDB::DEFAULT_VALUE_EMPTY_STRING` | ✓ |
+| `nullable` | `bool` | Used in `strict` mode. [^3] | `false` | ✓ |
+| `secure` | `bool` | Used in `strict` mode. [^4] | `false` | ✓ |
+| `updatable` | `bool` | Used in `strict` mode. [^5] | `false` | ✓ |
 
 ### Keys Type
 
-[^key_type]: 
+[^1]: 
 
 You can select key type. It will be usefull while formatting values. It will escape values which aren't the same as selected type.
 
 Groups are available to help definition :
-- `Binary`[^key_binary] ;
-- `Date`[^key_date] ;
-- `String`[^key_string] ;
-- `Integer`[^key_integer] ;
-- `Float`[^key_float] .
+- `Binary`[^7] ;
+- `Date`[^8] ;
+- `String`[^9] ;
+- `Integer`[^10] ;
+- `Float`[^11] .
 
 
-[^key_binary]: 
+[^7]: 
 *Binary Type*
 
 <table>
@@ -600,7 +631,7 @@ Groups are available to help definition :
   </tbody>
 </table>
 
-[^key_date]: 
+[^8]: 
 *Date Type*
 
 <table>
@@ -640,7 +671,7 @@ Groups are available to help definition :
   </tbody>
 </table>
 
-[^key_string]: 
+[^9]: 
 *String Type*
 
 <table>
@@ -705,7 +736,7 @@ Groups are available to help definition :
   </tbody>
 </table>
 
-[^key_integer]: 
+[^10]: 
 *Integer Type*
 
 <table>
@@ -755,7 +786,7 @@ Groups are available to help definition :
   </tbody>
 </table>
 
-[^key_float]: 
+[^11]: 
 *Float Type*
 
 <table>
@@ -787,32 +818,59 @@ Groups are available to help definition :
 
 ### Keys Index
 
-[^index_type]: 
 
-You can select key type. It will be usefull while formatting values. It will escape values which aren't the same as selected type.
+#### Column Index
+[^2]: 
+
+You can select key index.
+
+Index will be usefull if you decide to make SQL joining method.
+
+| Const               | Usage | Default ?                          |
+|----------------------|----|-------------------------------|
+| `DisciteDB::INDEX_TYPE_NONE` |   null   | ✓                |
+| `DisciteDB::INDEX_TYPE_INDEX`|  |
+| `DisciteDB::INDEX_TYPE_UNIQUE`|        |                     |
+| `DisciteDB::INDEX_TYPE_PRIMARY`| |                     |
+| `DisciteDB::INDEX_TYPE_FULLTEXT`| |                     |
+| `DisciteDB::INDEX_TYPE_SPATIAL`|        |                     |
+
+#### Table Index
+
+You can put a table name as `indexTable`. Usefull to rach joining methods.
 
 ### Nullable
 
-[^key_nullable]: 
-
-
+[^3]: 
+You can decide if a column can be nullable or not.
 
 ### Secure
 
-[^key_secure]: 
+[^4]: 
+In `strict` mode, secured values will not be returning. Such as password.
+
+In the futur, I would like to implement a few new operators such as login who would return only true or false if password match.
 
 
 ### Updatable
 
-[^key_updatable]: 
+[^5]: 
+In `strict` mode, this will disable updatable column value. Would be useful for id.
 
 
 ### Default
 
-[^key_default]: 
+[^6]: 
+You can specify default values. Or you define a string, integer, flaot, etc or you decide to use default pre-defined values.
 
-
-
+| Const               | Value |                          |
+|----------------------|----|-------------------------------|
+| `DisciteDB::DEFAULT_VALUE_NULL` |   `null`   |                 |
+| `DisciteDB::DEFAULT_VALUE_CURRENT_TIMESTAMP`|  `CURRENT_TIMESTAMP()` |
+| `DisciteDB::DEFAULT_VALUE_ZERO`|    0    |                     |
+| `DisciteDB::DEFAULT_VALUE_EMPTY_STRING`| ` ` |                     |
+| `DisciteDB::DEFAULT_VALUE_UUIDV4`| `uuid()` |                     |
+| `DisciteDB::DEFAULT_VALUE_NOW`|    `CURRENT_TIMESTAMP()`    |                     |
 
 ### Creating Keys
 
@@ -839,31 +897,473 @@ $disciteDB->keys()->add();
 
 WIP - documentation
 
+### Overview
+
+If you are in `loose` usage mode, you may skip this section.
+
+Access key configuration with:
+
+```php
+$disciteDB->tables();
+```
+
+### Table Parameters
+
+A table has several parameters:
+
+| Parameter | Type | Usage | Default | Nullable ? |
+| --- | --- | --- | --- | --- |
+| `name` | `string` | Showed name as object | `` |  |
+| `alias` | `string` | Used name in database | `$name` | ✓ |
+| `prefix` | `string` | Used prefix in database | `null` | ✓ |
+| `primaryKey` | `BaseKey` | Used to define primary key | `null` | ✓ |
+| `sort` | `DisciteDB::SORT_[...]` | Used if you want to set a default sorting method | `DisciteDB::SORT_NO_SORT` | ✓ |
+
+
 --- 
 
+## Query Operators
 
-## Query Methods
+You will be able to make queries with multiples operators.
+
+Theses operators are :
+- `All`;
+- `Count`;
+- `Listing`;
+- `Retrieve`;
+- `Update`;
+- `Delete`;
+- `Create` _Still not implemented_ ;
+- `Compare` _Still not implemented_ ;
+- `Keys` _Still not implemented_;
+
+### All Operator
+
+This operator will return every data in selected table
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->all();
+
+```
+
+### Count Operator
+
+This operator will return a count value.
+
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->count($args);
+
+```
+
+You can put filters as arguments. Arguments must be an array. You're able to put flat values, Query Conditions.
+
+```php
+
+$args = [
+  'columnName' => 'value',
+  'columnName' => QueryCondition::Or('value_1', 'value_2');,
+];
+
+```
+
+### Listing Operator
+
+This operator will return a values based on filters. It's like `all` operator with arguments.
+
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->listing($args);
+
+```
+
+You can put filters as arguments. Arguments must be an array. You're able to put flat values, Query Conditions or Query modifiers.
+
+```php
+
+$args = [
+  'columnName' => 'value',
+  'columnName' => QueryCondition::Or('value_1', 'value_2');,
+  QueryModifier::Sort(DisciteDB::SORT_DESC, 'id');
+];
+
+```
+
+### Retrieve Operator
+
+This operator will be used to retrieve single data.
+
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->retrieve($uuid);
+
+```
+
+UUID can be a `string`, an `integer` or an `array`. For the two first, in `strict` mode, primary indexed key will be used as id. If you want to manually specify uuid key name, you must set UUID as an array.
+
+```php
+
+// String or integer definition 
+$uuid = 3;
+
+// Array definition 
+$uuid = [
+  'columnName' => 'value',
+];
+```
+
+---
+
+### Update Operator
+
+This operator will be used to update data.
+
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->update($uuid, $args);
+
+```
+
+UUID can be a `string`, an `integer` or an `array`. For the two first, in `strict` mode, primary indexed key will be used as id. If you want to manually specify uuid key name, you must set UUID as an array.
+
+```php
+
+// String or integer definition 
+$uuid = 3;
+
+// Array definition 
+$uuid = [
+  'columnName' => 'value',
+];
+```
+
+You must put values as arguments. Arguments must be an array. You're able to put flat values only.
+
+```php
+
+$args = [
+  'columnName' => 'value',
+];
+
+```
+
+---
+
+### Delete Operator
+
+This operator will be used to delete data.
+
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->delete($uuid);
+
+```
+
+UUID can be a `string`, an `integer` or an `array`. For the two first, in `strict` mode, primary indexed key will be used as id. If you want to manually specify uuid key name, you must set UUID as an array.
+
+```php
+
+// String or integer definition 
+$uuid = 3;
+
+// Array definition 
+$uuid = [
+  'columnName' => 'value',
+];
+```
+
+---
+
+### Create Operator
+
+This operator will be used to create data.
+
+In `strict` mode, undefined values will be generate by the library with default previously defined values.
+
+```php
+
+$resultObject = $disciteDb->table('tableName')->create($args);
+
+```
+
+You must put values as arguments. Arguments must be an array. You're able to put flat values only.
+
+```php
+
+$args = [
+  'columnName' => 'value',
+];
+
+```
+
+---
+
+## Manipulate Queries
+
+You are able to manipulate queries. At this time, with previously showed `$args`. You would just set an `equal` condition and default sorting/limit.
+
+With theses user-friendly queries "manipulators", you'll see that is easy to perform a strong query.
+
+### Query Conditions
 
 Theses methods, used in `listing` and `count`, will auto-format (even in loose usage mode) query based on parameters you give.
 
+#### Equal Condition
+
+Simple Condition. Must not be used because you can perform this condition with a standard argument.
+
 ```php
-QueryMethod::Equals('value');
-QueryMethod::Not('value');
-QueryMethod::Contains('value', QueryLocation::Between);
-QueryMethod::StartsWith('value');
-QueryMethod::EndsWith('value');
-QueryMethod::MoreThan(10);
-QueryMethod::LessOrEqual(100);
-QueryMethod::Between(10, 20);
-QueryMethod::In(['val1', 'val2']);
-QueryMethod::NotIn(['val3', 'val4']);
-QueryMethod::IsNull();
-QueryMethod::IsNotNull();
+
+QueryCondition::Equal('value');
+
+```
+
+#### Or condition
+
+You can put every values as you want to check.
+
+```php
+QueryCondition::Or('value_1','value_2');
+```
+
+Library will format like this :
+```sql
+('columnName' = 'value_1' OR 'columnName' = 'value_2')
+```
+
+#### Contains condition
+
+You must send location. Default used const is `QUERY_LOCATION_BETWEEN`.
+
+```php
+QueryCondition::Contains('value', DisciteDB::QUERY_LOCATION_[...]);
+```
+
+Library will format like this :
+```sql
+'columnName' LIKE '%value%'
+```
+
+Location will format value as :
+| Const               | Value format                          |
+|----------------------|--------------------------------------|
+| `DisciteDB::QUERY_LOCATION_STARTWITH`       | `%value`               |
+| `DisciteDB::QUERY_LOCATION_ENDWITH`| `value%`|
+| `DisciteDB::QUERY_LOCATION_BETWEEN`        | `%value%`                    |
+
+#### Between condition
+
+You can put every values as you want to check.
+
+```php
+QueryCondition::Between(10, 20);
+```
+
+Library will format like this :
+```sql
+'columnName' BETWEEN 10 AND 20
+```
+
+#### Not condition
+
+
+```php
+QueryCondition::Not('value');
+```
+
+Library will format like this :
+```sql
+'columnName' != 'value'
+```
+
+if you specify more than one argument. `NotIn` condition will replace `Not` condition automaticly.
+
+#### NotIn condition
+
+
+```php
+QueryCondition::NotIn('value_1','value_2');
+```
+
+Library will format like this :
+```sql
+'columnName' NOT IN ('value_1', 'value_2')
+```
+
+if you specify only one argument. `Not` condition will replace `NotIn` condition automaticly.
+
+#### NotContains condition
+
+You must send location. Default used const is `QUERY_LOCATION_BETWEEN`.
+
+```php
+QueryCondition::NotContains('value', DisciteDB::QUERY_LOCATION_[...]);
+```
+
+Library will format like this :
+```sql
+'columnName' NOT LIKE '%value%'
+```
+
+
+Location will format value as :
+| Const               | Value format                          |
+|----------------------|--------------------------------------|
+| `DisciteDB::QUERY_LOCATION_STARTWITH`       | `%value`               |
+| `DisciteDB::QUERY_LOCATION_ENDWITH`| `value%`|
+| `DisciteDB::QUERY_LOCATION_BETWEEN`        | `%value%`     
+
+#### Like condition
+
+You must send location. Default used const is `QUERY_LOCATION_BETWEEN`.
+
+```php
+QueryCondition::Like('value', DisciteDB::QUERY_LOCATION_[...]);
+```
+
+Library will format like this :
+```sql
+'columnName' LIKE '%value%'
+```
+
+
+Location will format value as :
+| Const               | Value format                          |
+|----------------------|--------------------------------------|
+| `DisciteDB::QUERY_LOCATION_STARTWITH`       | `%value`               |
+| `DisciteDB::QUERY_LOCATION_ENDWITH`| `value%`|
+| `DisciteDB::QUERY_LOCATION_BETWEEN`        | `%value%`     
+
+#### NotLike condition
+
+Aliase of `NotContains`.
+
+
+#### NotBetween condition
+
+```php
+QueryCondition::NotBetween(10, 20);
+```
+
+Library will format like this :
+```sql
+'columnName' NOT BETWEEN 10 AND 20
+```
+
+
+#### MoreThan condition
+
+```php
+QueryCondition::MoreThan(10);
+```
+
+Library will format like this :
+```sql
+'columnName' > 10
+```
+
+
+#### LessThan condition
+
+```php
+QueryCondition::LessThan(10);
+```
+
+Library will format like this :
+```sql
+'columnName' < 10
+```
+
+
+#### MoreOrEqual condition
+
+```php
+QueryCondition::MoreOrEqual(10);
+```
+
+Library will format like this :
+```sql
+'columnName' >= 10
+```
+
+
+#### LessOrEqual condition
+
+```php
+QueryCondition::LessOrEqual(10);
+```
+
+Library will format like this :
+```sql
+'columnName' <= 10
+```
+
+---
+
+### Query Modifiers
+
+Theses methods, used in `listing`, will give you additionals methods for results.
+
+
+#### Order Modifier
+
+```php
+QueryModifier::Order(DisciteDB::SORT_[...], 'columnName');
+```
+
+Library will format like this :
+```sql
+ORDER BY 'columnName' 'DESC'
+```
+
+Sorting available constants are :
+| Const               | Value format                          |
+|----------------------|--------------------------------------|
+| `DisciteDB::SORT_DESC`       | DESC sorting               |
+| `DisciteDB::SORT_ASC`| ASC sorting|
+| `DisciteDB::SORT_NO_SORT`        | null                    |
+
+
+#### Sort Modifier
+
+Aliase of order modifier.
+
+
+
+#### Limit Modifier
+
+If you decide to use limit modifier, you must specify a `limit` in `integer`.
+
+Define `Offset` is optional.
+
+```php
+QueryModifier::Limit($limit, ?$offset);
+```
+
+Library will format like this :
+```sql
+LIMIT 10 OFFSET 20
 ```
 
 ---
 
 ## Fetching Results
+
+Once you perform your query with operator. You will be able to retrieve results.
+
+```php
+$result = $disciteDB->table('tableName')->all();
+
+// Fetching all datas for example.
+$result->fetchAll();
+
+```
 
 | Method               | Description                          |
 |----------------------|--------------------------------------|
