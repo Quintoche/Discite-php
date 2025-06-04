@@ -240,7 +240,7 @@ class Database
      */
     public function map() : ?array
     {
-        return $this->map;
+        return $this->sqlMap;
     }
 
 
