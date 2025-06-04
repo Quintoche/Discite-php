@@ -28,6 +28,10 @@ Only the connection must be initialized outside the library for security reasons
 - [Usage Example](#usage-example)  
 - [General Functionality](#general-functionality)  
 - [Configuration](#configuration)  
+  - [Load SQL database](#Load-SQL-database)  
+    - [Load SQL database from file](#Load-SQL-database-from-file)  
+    - [Load SQL database from database](#Load-SQL-database-from-database)  
+    - [Retrieve map](#Retrieve-map)  
   - [Accessing Configuration](#accessing-the-configuration-interface)  
   - [Access to Configuration Constants](#access-to-configuration-variables)  
 - [General Configuration](#general-configuration)  
@@ -91,6 +95,11 @@ Only the connection must be initialized outside the library for security reasons
     - [Sort Modifier](#Sort-Modifier)
     - [Limit Modifier](#Limit-Modifier)
 - [Fetching Results](#Fetching-Results)
+  - [Fetching Query](#Fetching-Query)
+  - [Fetching All](#Fetching-All)
+  - [Fetching Next](#Fetching-Next)
+  - [Fetching Array](#Fetching-Array)
+  - [Fetching Informations](#Fetching-Informations)
 - [Project Structure](#Project-Structure)
 - [License](#License)
 
@@ -122,32 +131,54 @@ error_reporting(E_ALL);
 
 require 'default_file.php';
 
+// Define your connection
 $_connection = new mysqli('localhost','root','','test_db');
+
+// Snitialize DisciteDB Database
 $disciteDB = new \DisciteDB\Database($_connection);
 
+// Set some configurations
+  // Charset conf
 $disciteDB->configuration()->setCharset(DisciteDB::CHARSET_UTF8MB4);
+  // Collation conf
 $disciteDB->config()->setCollation(DisciteDB::COLLATION_UTF8MB4_UNICODE_CI);
+  // Table usage conf (look at [Usage Modes] for more informations)
 $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
+  // Key usage conf (look at [Usage Modes] for more informations)
 $disciteDB->conf()->setKeyUsage(DisciteDB::KEY_USAGE_LOOSE);
 
+//Here, I decide to list all rows from 'disciteDB_FakeItems'
+//That match the following arguments :
+  // name is not "White Widget"
+  // description start contains "and"
+  // price is less or equal "25"
 $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
     'name'=>QueryCondition::Not('White Widget'),
-    'description'=>QueryCondition::Contains('and', QueryLocation::Between),
+    'description'=>QueryCondition::Contains('and', DisciteDB::QUERY_LOCATION_BETWEEN),
     'price' => QueryCondition::LessOrEqual(25),
 ]);
 
+// You can, after that :
+
+// retrieve the SQL Query
 echo '<b>QUERY</b>';
 var_dump($queryFakeItems->fetchQuery());
 
+// Retrieve informations (affected rows, time, statut, etc)
 echo '<b>INFORMATIONS ONLY</b>';
 var_dump($queryFakeItems->fetchInformations());
 
+// Fetch the next data
+  // Is like mysqli_fetch_row || mysqli_result::fetch_row
 echo '<b>NEXT DATA</b>';
 var_dump($queryFakeItems->fetchNext());
 
+// Fetch all datas
+  // Is like mysqli_fetch_all($result, MYSQLI_ASSOC); || mysqli_result::fetch_all(int $mode = MYSQLI_ASSOC)
 echo '<b>ALL DATA</b>';
 var_dump($queryFakeItems->fetchAll());
 
+// Fetch all datas AND informations as an associative array
 echo '<b>ALL DATA AND INFORMATIONS</b>';
 var_dump($queryFakeItems->fetchArray());
 ```
@@ -175,17 +206,61 @@ If no connection is provided, the manager will use the following default values:
     </tr>
   </thead>
   <tbody>
-    <tr><td>Host</td><td>`localhost`</td><td></td></tr>
-    <tr><td>Username</td><td>`root`</td><td></td></tr>
-    <tr><td>Password</td><td>`null`</td><td></td></tr>
-    <tr><td>Database</td><td>`db`</td><td></td></tr>
-    <tr><td>Port</td><td>`null`</td><td></td></tr>
+    <tr><td>Host</td><td>localhost</td><td></td></tr>
+    <tr><td>Username</td><td>root</td><td></td></tr>
+    <tr><td>Password</td><td>null</td><td></td></tr>
+    <tr><td>Database</td><td>db</td><td></td></tr>
+    <tr><td>Port</td><td>null</td><td></td></tr>
   </tbody>
 </table>
 
 ---
 
 ## Configuration
+
+### Load SQL database
+
+if you want to keep `strict` mode (and so, have security, auto-join, etc) available, you can - if you don't want to make manuals definitions - load database directly from a file or the database.
+
+#### Load SQL database from file
+
+```php
+// Initialize the DisciteDB Manager
+$disciteDB = new \DisciteDB\Database($connection);
+
+// Perform loading
+$disciteDB->loadFromFile($path, $updatingTime);
+```
+
+The library will load tables and columns from a file. 
+
+To improve some performances, you can add `$updatingTime` in seconds. If the file is older than the max storage time (`createdTime + $updatingTime`), the library will update the file.
+
+If you want to update the file each time you initialize the library, just set the time to `0`.
+
+#### Load SQL database from database
+
+```php
+// Initialize the DisciteDB Manager
+$disciteDB = new \DisciteDB\Database($connection);
+
+// Perform loading
+$disciteDB->loadFromDatabase();
+```
+
+The library will load tables and columns directly from database connection. 
+
+#### Retrieve map
+
+You can retrieve `SQLmap` as an array with a simple method.
+
+```php
+// Initialize the DisciteDB Manager
+$disciteDB = new \DisciteDB\Database($connection);
+
+// Perform loading
+$disciteDB->map();
+```
 
 ### Overview
 
@@ -1357,21 +1432,240 @@ LIMIT 10 OFFSET 20
 
 Once you perform your query with operator. You will be able to retrieve results.
 
-```php
-$result = $disciteDB->table('tableName')->all();
-
-// Fetching all datas for example.
-$result->fetchAll();
-
-```
-
 | Method               | Description                          |
 |----------------------|--------------------------------------|
 | `fetchQuery()`       | Returns SQL string only              |
-| `fetchInformations()`| Meta-information (types, keys, etc.)|
-| `fetchNext()`        | Gets the next row                    |
 | `fetchAll()`         | Gets all matching rows               |
+| `fetchNext()`        | Gets the next row                    |
 | `fetchArray()`       | Gets all rows and schema info        |
+| `fetchInformations()`| Meta-information (types, keys, etc.)|
+
+### Fetching Query
+
+You'll retrieve the query as `string`
+
+```php
+$result = $disciteDB->table('disciteDB_FakeItems')->all();
+
+// Fetching query for example.
+print_r($result->fetchQuery());
+
+```
+
+Result will be :
+
+```php
+
+string(45) "SELECT * FROM `test_db`.`disciteDB_FakeItems`"
+
+```
+
+### Fetching All
+
+You'll retrieve all results as `array`.
+
+Doing this will make the same result as : `mysqli_fetch_all($result, MYSQLI_ASSOC)` or `mysqli_result::fetch_all(int $mode = MYSQLI_ASSOC)`
+
+```php
+$result = $disciteDB->table('disciteDB_FakeItems')->all();
+
+// Fetching all datas for example.
+print_r($result->fetchAll());
+
+```
+
+Result will be :
+
+```php
+
+array(12) {
+    [0]=>
+  array(6) {
+    ["id"]=>
+    int(2)
+    ["category_id"]=>
+    int(1)
+    ["name"]=>
+    string(10) "Red Widget"
+    ["description"]=>
+    string(29) "A slightly larger red widget."
+    ["price"]=>
+    float(15.4900000000000002131628207280300557613372802734375)
+    ["created_at"]=>
+    string(19) "2025-06-04 19:45:27"
+  }
+  [1]=>
+  array(6) {
+    ["id"]=>
+    int(3)
+    ["category_id"]=>
+    int(1)
+    ["name"]=>
+    string(12) "Green Widget"
+    ["description"]=>
+    string(23) "A stylish green widget."
+    ["price"]=>
+    float(13.75)
+    ["created_at"]=>
+    string(19) "2025-06-04 19:45:27"
+  }
+  // .........
+  }
+
+```
+
+### Fetching Next
+
+You'll retrieve the next result as `array`.
+
+Doing this will make the same result as : `mysqli_fetch_row($result)` or `mysqli_result::fetch_row()`.
+
+Informations will be also returned.
+
+```php
+$result = $disciteDB->table('disciteDB_FakeItems')->all();
+
+// Fetching next data for example.
+print_r($result->fetchNext());
+
+```
+
+Result will be :
+
+```php
+
+array(2) {
+  ["data"]=>
+  array(6) {
+    ["id"]=>
+    int(1)
+    ["category_id"]=>
+    int(1)
+    ["name"]=>
+    string(11) "Blue Widget"
+    ["description"]=>
+    string(32) "A small blue widget for testing."
+    ["price"]=>
+    float(10.9900000000000002131628207280300557613372802734375)
+    ["created_at"]=>
+    string(19) "2025-06-04 19:45:27"
+  }
+  ["info"]=>
+  array(4) {
+    ["status"]=>
+    string(7) "success"
+    ["time"]=>
+    int(1749059127)
+    ["query"]=>
+    array(5) {
+      ["operator"]=>
+      string(3) "All"
+      ["table"]=>
+      string(19) "disciteDB_FakeItems"
+      ["context"]=>
+      NULL
+      ["gaveArgments"]=>
+      int(0)
+      ["affectedRows"]=>
+      int(12)
+    }
+    ["error"]=>
+    NULL
+  }
+}
+```
+
+### Fetching Array
+
+You'll retrieve all datas as `array`.
+
+Doing this will make the same result as : `mysqli_fetch_all($result, MYSQLI_ASSOC)` or `mysqli_result::fetch_all(int $mode = MYSQLI_ASSOC)`.
+
+Informations will be also returned.
+
+```php
+$result = $disciteDB->table('disciteDB_FakeItems')->all();
+
+// Fetching array datas for example.
+print_r($result->fetchArray());
+
+```
+
+Result will be :
+
+```php
+
+array(2) {
+  ["data"]=>
+  array(12) {
+    // Datas
+  }
+  ["info"]=>
+  array(4) {
+    ["status"]=>
+    string(7) "success"
+    ["time"]=>
+    int(1749059127)
+    ["query"]=>
+    array(5) {
+      ["operator"]=>
+      string(3) "All"
+      ["table"]=>
+      string(19) "disciteDB_FakeItems"
+      ["context"]=>
+      NULL
+      ["gaveArgments"]=>
+      int(0)
+      ["affectedRows"]=>
+      int(12)
+    }
+    ["error"]=>
+    NULL
+  }
+}
+```
+
+### Fetching Informations
+
+You'll retrieve informations only as `array`.
+
+
+```php
+$result = $disciteDB->table('disciteDB_FakeItems')->all();
+
+// Fetching informations for example.
+print_r($result->fetchInformations());
+
+```
+
+Result will be :
+
+```php
+
+array(4) {
+  ["status"]=>
+  string(7) "success"
+  ["time"]=>
+  int(1749059127)
+  ["query"]=>
+  array(5) {
+    ["operator"]=>
+    string(3) "All"
+    ["table"]=>
+    string(19) "disciteDB_FakeItems"
+    ["context"]=>
+    NULL
+    ["gaveArgments"]=>
+    int(0)
+    ["affectedRows"]=>
+    int(12)
+  }
+  ["error"]=>
+  NULL
+}
+
+```
+
 
 
 --- 
