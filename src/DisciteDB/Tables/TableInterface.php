@@ -2,6 +2,9 @@
 
 namespace DisciteDB\Tables;
 
+use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Config\Enums\QuerySort;
+use DisciteDB\Keys\BaseKey;
 use DisciteDB\QueryHandler\QueryResult;
 
 interface TableInterface
@@ -73,7 +76,6 @@ interface TableInterface
      * @return QueryResult
      */
     public function keys(): QueryResult;
-
 }
 
 ?>

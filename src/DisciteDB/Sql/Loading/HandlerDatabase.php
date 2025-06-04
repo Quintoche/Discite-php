@@ -35,6 +35,10 @@ class HandlerDatabase
         
     }
 
+    public function getArray() : ?array
+    {
+        return $this->array;
+    }
 
     private function retrieveArray() : array
     {

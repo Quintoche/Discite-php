@@ -49,8 +49,13 @@ class HandlerFile
         
     }
 
+    public function getArray() : ?array
+    {
+        return $this->array;
+    }
 
-    private function retrieveFile()
+
+    private function retrieveFile() : void
     {
         if (file_exists($this->path)) 
         {

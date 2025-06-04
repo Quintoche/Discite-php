@@ -3,22 +3,15 @@ namespace DisciteDB;
 
 use DisciteDB\Config\Enums\TableUsage;
 use DisciteDB\Core\DebugManager;
-use DisciteDB\Core\ExceptionsManager;
 use DisciteDB\Core\KeysManager;
 use DisciteDB\Core\LogsManager;
-use DisciteDB\Core\QueryManager;
 use DisciteDB\Core\SecurityManager;
 use DisciteDB\Core\TablesManager;
 use DisciteDB\Core\UsersManager;
-use DisciteDB\Exceptions\TableException;
-use DisciteDB\Keys\BaseKey;
 use DisciteDB\QueryHandler\QueryResult;
-use DisciteDB\Sql\Loading\Handler;
 use DisciteDB\Sql\Loading\HandlerDatabase;
 use DisciteDB\Sql\Loading\HandlerFile;
-use DisciteDB\Tables\BaseTable;
 use DisciteDB\Tables\TableInterface;
-use DisciteDB\Users\BaseUser;
 use mysqli;
 
 /**
@@ -78,6 +71,12 @@ class Database
      * @var DebugManager Debug manager instance.
      */
     protected DebugManager $debugManager;
+
+
+    /**
+     * @var ?array map of SQL file or from SQL Database.
+     */
+    protected ?array $sqlMap;
 
     /**
      * Database constructor.
@@ -257,7 +256,7 @@ class Database
      */
     public function loadFromDatabase() : void
     {
-        new HandlerDatabase($this->connection()->get(), $this);
+        $this->sqlMap = (new HandlerDatabase($this->connection()->get(), $this))->getArray();
     }
 
     /**
@@ -273,7 +272,7 @@ class Database
      */
     public function loadFromFile(string $path, int $updatingTime) : void
     {
-        new HandlerFile($path, $updatingTime, $this->connection()->get(), $this);
+        $this->sqlMap = (new HandlerFile($path, $updatingTime, $this->connection()->get(), $this))->getArray();
     }
 
 
