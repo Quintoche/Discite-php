@@ -231,6 +231,20 @@ class Database
 
 
     /**
+     * Retrieve SQL map.
+     * 
+     * Return SQL map if you decide to load database from SQL requests or file.
+     * 
+     * @return ?array Returns the multidmentional array of map if exist.
+     * 
+     */
+    public function map() : ?array
+    {
+        return $this->map;
+    }
+
+
+    /**
      * Magic getter to retrieve a table interface by property access.
      * 
      * Allows syntax like $database->tableName.
