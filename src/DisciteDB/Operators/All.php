@@ -21,7 +21,10 @@ trait All
     public function all() : QueryResult
     {
         $this->query->setOperator(Operators::All);
+        
+        // Add sorting
         $this->query->setArgs([]);
+
 
         return $this->query->makeQuery();
     }

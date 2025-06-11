@@ -9,6 +9,7 @@ use DisciteDB\QueryHandler\QueryHandler;
 use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Sql\Clause\ClauseArgument;
 use DisciteDB\Tables\BaseTable;
+use DisciteDB\Utilities\PonderationUtility;
 use mysqli;
 
 class QueryManager
@@ -29,9 +30,11 @@ class QueryManager
 
     protected QueryResult $queryResult;
 
+    protected PonderationUtility $ponderationUtility;
+
     protected QueryType $queryType = QueryType::Data;
 
-    protected ?array $args = null;
+    protected array|string|null $args = null;
 
     protected ?array $uuid = [];
     
@@ -57,12 +60,13 @@ class QueryManager
     public function setConnection(mysqli $connection) : void
     {
         $this->connection = $connection;
+        $this->ponderationUtility = new PonderationUtility($this->connection);
     }
     public function setOperator(Operators $operator) : void
     {
         $this->operator = $operator;
     }
-    public function setArgs(?array $args) : void
+    public function setArgs(mixed $args) : void
     {
         $this->args = ClauseArgument::evaluateArguments($args, $this, $this->database) ?? [];
     }
@@ -87,7 +91,7 @@ class QueryManager
     {
         return $this->connection;
     }
-    public function getArgs() : ?array
+    public function getArgs() : mixed
     {
         return $this->args;
     }
@@ -113,6 +117,11 @@ class QueryManager
     public function getQueryResult() : ?QueryResult
     {
         return $this->queryResult;
+    }
+
+    public function getPonderationUtily() : PonderationUtility
+    {
+        return $this->ponderationUtility;
     }
     
     public function makeQuery(?ExceptionsManager $exception = null) : QueryResult

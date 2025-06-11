@@ -13,11 +13,11 @@ use DisciteDB\Methods\QueryModifierExpression;
 
 class ClauseArgument
 {
-    public static function evaluateArguments(?array $args, QueryManager $queryManager, Database $database) : ?array
+    public static function evaluateArguments(mixed $args, QueryManager $queryManager, Database $database) : ?array
     {
         $_class = '\DisciteDB\Sql\Format\Format'.ucfirst($queryManager->getOperator()->name);
         
-        return (new $_class($args, $database))->argumentsFormater();
+        return (new $_class($args, $database))->argumentsFormater($queryManager);
     }
 
     public static function isMethod(mixed $arg) : bool
@@ -47,12 +47,12 @@ class ClauseArgument
 
     private static function getValidKey(string $key, Database $database) : ?BaseKey
     {
-        return $database->map[$key] ?? null;
+        return $database->keys()->$key ?? null;
     }
 
     private static function isValidKey(string $key, Database $database) : bool
     {
-        return !is_null($database->map[$key] ?? null);
+        return !is_null($database->keys()->$key ?? null);
     }
 
     

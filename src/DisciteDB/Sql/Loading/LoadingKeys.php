@@ -103,7 +103,7 @@ class LoadingKeys
             'longtext'      => DisciteDB::TYPE_STRING_LONGTEXT, 
             'enum'          => self::returnTypeString($length), 
             'set'           => self::returnTypeString($length),
-            'tinyint'       => self::returnTypeInteger($length),
+            'tinyint'       => DisciteDB::TYPE_INTEGER_BOOLEAN,
             'smallint'      => DisciteDB::TYPE_INTEGER_SMALLINT,
             'mediumint'     => DisciteDB::TYPE_INTEGER_MEDIUMINT,
             'int'           => DisciteDB::TYPE_INTEGER_INT,

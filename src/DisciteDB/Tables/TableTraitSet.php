@@ -33,6 +33,11 @@ trait TableTraitSet
         $this->sort = $sort ?? null;
     }
 
+    public function setSortKey(BaseKey $sortKey) : void
+    {
+        $this->sortKey = $sortKey ?? null;
+    }
+
     public function setMagicValue(string $key, mixed $value) : void
     {
         if(property_exists($this, $key))

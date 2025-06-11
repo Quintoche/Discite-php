@@ -68,6 +68,11 @@ class QueryHandler
         return $this->handlerMethod->retrieve();
     }
 
+    public function returnForeign() : ?array
+    {
+        return $this->handlerMethod->retrieveForeign();
+    }
+
     private function handleUuid() : void
     {
         if($this->queryManager->getUuid() === null) return;
@@ -76,7 +81,7 @@ class QueryHandler
 
     private function handleArguments() : void
     {
-        $this->handlerArguments = new HandlerArgument($this->queryManager);
+        $this->handlerArguments = new HandlerArgument($this->queryManager, $this->handlerMethod->retrieveForeign());
     }
     private function handleMethods() : void
     {

@@ -112,7 +112,8 @@ class ResultData extends AbstractResult implements Result
     private function handleSuccess() : void
     {
         $this->resultData = match ($this->queryManager->getOperator()) {
-            Operators::CountAll => array_values(mysqli_fetch_row($this->rawResult))[0],
+            Operators::CountAll => intval(array_values(mysqli_fetch_row($this->rawResult))[0]) ?? 0,
+            Operators::Count => intval(array_values(mysqli_fetch_row($this->rawResult))[0]) ?? 0,
             default => null,
         };
     }

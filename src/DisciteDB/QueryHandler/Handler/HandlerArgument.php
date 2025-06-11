@@ -8,6 +8,7 @@ use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Methods\QueryModifierExpression;
 use DisciteDB\Sql\Data\DataKey;
+use DisciteDB\Sql\Data\DataTable;
 
 class HandlerArgument
 {
@@ -19,15 +20,18 @@ class HandlerArgument
 
     protected ?array $argumentArguments;
 
+    protected ?array $definedColumn = null;
+
     protected QueryManager $queryManager;
 
     protected Operators $operator;
     
     protected ?array $args;
 
-    public function __construct(QueryManager $queryManager)
+    public function __construct(QueryManager $queryManager, ?array $column = null)
     {
         $this->queryManager = $queryManager;
+        $this->definedColumn = $column;
 
         $this->args = $this->escapeArgs($this->queryManager->getArgs());
 
@@ -37,6 +41,11 @@ class HandlerArgument
     public function retrieve() : array
     {
         return $this->argumentArray;
+    }
+
+    public function add($k, $v, $a)
+    {
+
     }
 
     private function escapeArgs(mixed $args) : ?array
@@ -65,6 +74,27 @@ class HandlerArgument
             $_array_arguments[] = $this->createArgsArguments($k, $v);
         }
 
+        if($this->definedColumn && $this->queryManager->getOperator() == Operators::Search)
+        {
+            $_value = array_values($this->queryManager->getArgs())[0];
+            $_column = $this->definedColumn[$this->queryManager->getTable()->getAlias()] ?? $this->definedColumn[$this->queryManager->getTable()->getName()];
+
+            foreach($_column as $columnData)
+            {
+                if(!is_array($columnData)) continue;
+
+                foreach($columnData as $name => $data)
+                {
+                    foreach($data as $k => $v)
+                    {
+                        $_array_keys[] = DataTable::escape($name).'.'. $this->createArgsKeys($v);
+                        $_array_values[] = $this->createArgsValues($_value);
+                        $_array_arguments[] = DataTable::escape($name).'.'.$this->createArgsKeys($v).' LIKE '. $this->createArgsValues($_value);
+                    }
+                }
+            }
+        }
+
         $this->argumentKeys = $_array_keys;
         $this->argumentValues = $_array_values;
         $this->argumentArguments = $_array_arguments;
@@ -80,6 +110,7 @@ class HandlerArgument
     {
         return match ($this->queryManager->getOperator()) {
             Operators::Update => ', ',
+            Operators::Search => ' OR ',
             default => ' AND ',
         };
     }

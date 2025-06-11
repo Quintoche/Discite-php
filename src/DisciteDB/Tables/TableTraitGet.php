@@ -32,6 +32,11 @@ trait TableTraitGet
         return $this->sort ?? null;
     }
 
+    public function getSortKey() : BaseKey|null
+    {
+        return $this->sortKey ?? null;
+    }
+
     public function getMap() : array|null
     {
         return $this->map ?? null;

@@ -11,6 +11,7 @@ use DisciteDB\Operators\Keys;
 use DisciteDB\Operators\Listing;
 use DisciteDB\Operators\Retrieve;
 use DisciteDB\Operators\Update;
+use DisciteDB\Operators\Search;
 
 /**
  * Récupère dynamiquement une table de la base.
@@ -28,6 +29,7 @@ final class CustomTable extends BaseTable implements TableInterface
     use Listing;
     use Retrieve;
     use Update;
+    use Search;
 }
 
 ?>

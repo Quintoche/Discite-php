@@ -92,7 +92,7 @@ class QueryResult
 
 
 
-    public function fetch() : array
+    public function fetch() : array|string|int
     {
         return $this->result->getResult() ?? $this->result->getResultAll() ?? [];
     }
@@ -102,7 +102,7 @@ class QueryResult
         return $this->result->getQuery() ?? '';
     }
 
-    public function fetchAll() : array
+    public function fetchAll() : array|string|int
     {
         return $this->result->getResult() ?? $this->result->getResultAll() ?? [];
     }

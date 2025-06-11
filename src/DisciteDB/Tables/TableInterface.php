@@ -71,6 +71,14 @@ interface TableInterface
     public function retrieve(string|int|array $uuid): QueryResult;
 
     /**
+     * Search in the table.
+     *
+     * @param mixed $argument
+     * @return QueryResult
+     */
+    public function search(mixed $argument): QueryResult;
+
+    /**
      * Get table keys.
      *
      * @return QueryResult

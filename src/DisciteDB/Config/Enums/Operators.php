@@ -116,5 +116,13 @@ enum Operators : int
      * Don't not try to update or modify theses values.
     */
     case CountAll = 5811;
+
+    /** 
+     * __Search__
+     * 
+     * Search operator used in back code to retrieve operators.
+     * Don't not try to update or modify theses values.
+    */
+    case Search = 5812;
 }
 ?>

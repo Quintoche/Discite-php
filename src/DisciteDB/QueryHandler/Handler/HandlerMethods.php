@@ -4,6 +4,7 @@ namespace DisciteDB\QueryHandler\Handler;
 
 use DisciteDB\Config\Enums\IndexType;
 use DisciteDB\Config\Enums\KeyUsage;
+use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Config\Enums\TableUsage;
 use DisciteDB\Core\QueryManager;
 use DisciteDB\Sql\Clause\ClauseTable;
@@ -44,8 +45,10 @@ class HandlerMethods
 
     public function retrieve() : ?array
     {
-        if ($this->queryManager->getInstance()->config()->getTableUsage() == TableUsage::LooseUsage) return [];
-        if ($this->queryManager->getInstance()->config()->getKeyUsage() == KeyUsage::LooseUsage) return [];
+        if ($this->queryManager->getInstance()->config()->getTableUsage() == TableUsage::LooseUsage) return ['COUNT' => 0];
+        if ($this->queryManager->getInstance()->config()->getKeyUsage() == KeyUsage::LooseUsage) return ['COUNT' => 0];
+
+        if($this->queryManager->getOperator() == Operators::Count || $this->queryManager->getOperator() == Operators::CountAll) return ['COUNT' => 0];
 
         return $this->argumentArray ?? ['COUNT' => 0];
     }
@@ -96,7 +99,7 @@ class HandlerMethods
             $this->currentKey[] = $this->escapeKey($key->getAlias()) ?? $this->escapeKey($key->getName());
 
             if(in_array($foreignTable,$this->foreignTable)) continue;
-            $this->foreignTable[] = $_foreignTable->getAlias() ?? $_foreignTable->getName();
+            $this->foreignTable[] = $this->escapeTable($_foreignTable->getAlias()) ?? $this->escapeTable($_foreignTable->getName());
 
             if(!$this->tableHasIndexKey($_foreignTable)) continue;
 

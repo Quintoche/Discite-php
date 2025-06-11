@@ -128,6 +128,7 @@ class HandlerStructure
             Operators::Count, Operators::CountAll => 'COUNT(*)',
             Operators::Sum => 'SUM({COLUMN})',
             Operators::Average => 'AVG({COLUMN})',
+            // Operators::Search => $this->structureColumn.', '.$this->createPonderate(),
             default => $this->structureColumn,
         };
     }
@@ -138,6 +139,11 @@ class HandlerStructure
     private function getStructureTable() : string
     {
         return DataTable::escape($this->queryManager->getTable()->getName()) ?? DataTable::escape($this->queryManager->getTable()->getAlias());
+    }
+
+    private function createPonderate() : string
+    {
+        return $this->queryManager->getPonderationUtily()->setTable($this->queryManager->getTable())->handle();
     }
 }
 

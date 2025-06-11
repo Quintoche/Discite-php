@@ -108,6 +108,16 @@ abstract class BaseTable implements TableInterface
 
 
     /**
+     * Default sorting key.
+     *
+     * Usually 'DESC' or 'ASC'. Used when retrieving collections.
+     *
+     * @var BaseKey|null
+     */
+    protected ?BaseKey $sortKey = null;
+
+
+    /**
      * Internal mapping between fields and their properties.
      *
      * Used to describe data structure, types, and rules.
