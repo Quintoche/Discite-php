@@ -29,9 +29,9 @@ trait Create
 
         if($default) $class->setDefault($default);
 
-        if($nullable) $class->setNullable($nullable);
-        if($secure) $class->setSecure($secure);
-        if($updatable) $class->setUpdatable($updatable);
+        $class->setNullable($nullable);
+        $class->setSecure($secure);
+        $class->setUpdatable($updatable);
 
         $this->createAppendTable($name,$class);
 

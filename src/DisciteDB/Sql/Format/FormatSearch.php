@@ -33,24 +33,23 @@ class FormatSearch
     {
         if($this->argsLooseUsage()) return (array) $this->args;
 
-        $queryManager->getPonderationUtily()->setArgument($this->args);
+        $args = $this->argsLoop($queryManager->getTable());
+        $queryManager->getPonderationUtily()->setArgument($args);
 
-        return $this->argsLoop($queryManager->getTable());
+        return $args;
     }
 
     private function argsLoop(BaseTable $table) : ?array
     {
-        $_array = [];
-
         return match(true)
         {
-            is_array($this->args) => [''],
+            is_array($this->args) => $this->formatArrayFromArray($table,$this->args),
             is_null($this->args) => [],
-            default => $this->createArray($table,$this->args),
+            default => $this->formatArrayFromString($table,$this->args),
         };
     }
 
-    private function createArray(BaseTable $table, $arg)
+    private function formatArrayFromArray(BaseTable $table, array $args) : array
     {
         $_array = [];
 
@@ -58,12 +57,54 @@ class FormatSearch
         {
             if(in_array($key->getAlias(),$this->bannedKeys)) continue;
 
-            $_array[$key->getAlias() ?? $key->getName()] = QueryCondition::Contains($arg);
+            foreach($args as $argv)
+            {
+                foreach($this->createSingleWildcard($argv) as $arg)
+                {
+                    $_array[] = [$key->getAlias() ?? $key->getName() => QueryCondition::Contains($arg)];
+                }
+            }
         }
 
         return $_array;
     }
 
+    private function formatArrayFromString(BaseTable $table, mixed $args) : array
+    {
+        $_array = [];
+        
+        foreach($table->getMap() as $key)
+        {
+            if(in_array($key->getAlias(),$this->bannedKeys)) continue;
+
+            foreach($this->createSingleWildcard($args) as $arg)
+            {
+                $_array[] = [$key->getAlias() ?? $key->getName() => QueryCondition::Contains($arg)];
+            }
+        }
+
+        return $_array;
+    }
+
+    private function createSingleWildcard(string $arg) : array
+    {
+        $argLetters = str_split($arg);
+        $argLength = sizeof($argLetters);
+
+        if($argLength < 2) return [$arg];
+
+        $_array = [];
+
+        for($i=0;$i<$argLength;$i++)
+        {
+            $newArgLetters = $argLetters;
+            $newArgLetters[$i] = '_';
+
+            $_array[] = implode('',$newArgLetters);
+        }
+
+        return $_array;
+    }
 
     private function argsLooseUsage() : bool
     {

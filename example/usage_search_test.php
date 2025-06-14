@@ -30,7 +30,7 @@ error_reporting(E_ALL);
     $disciteDB->loadFromFile(dirname(__DIR__, 2).'/discite-php/.files/sql.cache.json',0);
 
     // QUERY -- RETRIEVE
-    $queryFakeItems = $disciteDB->table('user_office')->search('sous');
+    $queryFakeItems = $disciteDB->table('user_office')->all();
 
     $end = microtime(true);
     $duration = ($end - $start) * 1000;

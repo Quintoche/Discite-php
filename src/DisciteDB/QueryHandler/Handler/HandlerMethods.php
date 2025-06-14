@@ -39,6 +39,7 @@ class HandlerMethods
         $this->indexKey = $this->getIndexKey($this->queryManager->getTable());
 
         $this->multiArray = $this->getForeign($this->indexKey, $this->queryManager->getTable());
+        
 
         $this->createArgs();
     }
@@ -53,7 +54,7 @@ class HandlerMethods
         return $this->argumentArray ?? ['COUNT' => 0];
     }
 
-    public function retrieveForeign()
+    public function retrieveForeign() : ?array
     {   
         return $this->multiArray;
     }
@@ -79,7 +80,6 @@ class HandlerMethods
             $_array[$table->getAlias() ?? $table->getName()][] = $keys->getAlias();
         }
             
-
         foreach($indexKeys as $i => $key)
         {
             if(!$key->getIndexTable()) {$this->removeIndexKey($i); continue;}

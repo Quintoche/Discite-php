@@ -11,7 +11,7 @@ class QueryTemplateConfig
     public static array $MAP = 
     [
         QueryTemplate::Select->name     => [QueryStructure::Base,QueryStructure::Structure,QueryStructure::Methods,QueryStructure::Conditions],
-        QueryTemplate::SelectAll->name  => [QueryStructure::Base,QueryStructure::Structure,],
+        QueryTemplate::SelectAll->name  => [QueryStructure::Base,QueryStructure::Structure,QueryStructure::Methods],
         QueryTemplate::Update->name     => [QueryStructure::Base,QueryStructure::Structure,QueryStructure::Datas,QueryStructure::Conditions],
         QueryTemplate::Insert->name     => [QueryStructure::Base,QueryStructure::Structure,QueryStructure::Datas],
         QueryTemplate::Delete->name     => [QueryStructure::Base,QueryStructure::Structure,QueryStructure::Conditions],       

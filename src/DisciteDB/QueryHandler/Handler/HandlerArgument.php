@@ -69,6 +69,12 @@ class HandlerArgument
 
         foreach($this->args as $k => $v)
         {
+            if(is_int($k) && is_array($v))
+            {
+                $k = array_keys($v)[0];
+                $v = array_values($v)[0];
+            }
+
             $_array_keys[] = $this->createArgsKeys($k);
             $_array_values[] = $this->createArgsValues($v);
             $_array_arguments[] = $this->createArgsArguments($k, $v);
@@ -89,7 +95,7 @@ class HandlerArgument
                     {
                         $_array_keys[] = DataTable::escape($name).'.'. $this->createArgsKeys($v);
                         $_array_values[] = $this->createArgsValues($_value);
-                        $_array_arguments[] = DataTable::escape($name).'.'.$this->createArgsKeys($v).' LIKE '. $this->createArgsValues($_value);
+                        $_array_arguments[] = str_replace('{TABLE}',DataTable::escape($name),$this->createArgsArguments($v, $_value));
                     }
                 }
             }
@@ -105,6 +111,7 @@ class HandlerArgument
             'CONDITIONS' => $this->argumentArguments,
             'SEPARATOR' => $this->createArgsSeparator()
         ];
+
     }
     private function createArgsSeparator()
     {
@@ -120,10 +127,12 @@ class HandlerArgument
     }
     private function createArgsValues(mixed $value) : string
     {
+        if(is_array($value)) $value = array_values($value)[0];
         return ($value instanceof QueryConditionExpression) ? $value->returnValue($this->queryManager->getConnection()) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnValue($this->queryManager->getConnection());
     }
     private function createArgsArguments(string $key, mixed $value) : string
     {
+        if(is_array($value)) $value = array_values($value)[0];
         return ($value instanceof QueryConditionExpression) ? $value->returnCondition($key, $this->queryManager->getConnection()) : (new QueryConditionExpression(QueryOperator::Equal,[$value]))->returnCondition($key, $this->queryManager->getConnection());
     }
 }

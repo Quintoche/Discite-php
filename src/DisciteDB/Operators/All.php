@@ -21,8 +21,8 @@ trait All
     public function all() : QueryResult
     {
         $this->query->setOperator(Operators::All);
-        
-        // Add sorting
+
+        // Add auto sorting if 
         $this->query->setArgs([]);
 
 

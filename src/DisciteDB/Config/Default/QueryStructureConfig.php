@@ -26,7 +26,7 @@ class QueryStructureConfig
         ],        
         QueryStructure::Methods->name  => [
             QueryTemplate::Select->name => 'LEFT JOIN {TABLE_FOREIGN} ON {TABLE}.{INDEX_KEY} = {TABLE_FOREIGN}.{FOREIGN_PRIMARY_KEY}',
-            QueryTemplate::SelectAll->name => null,
+            QueryTemplate::SelectAll->name => 'LEFT JOIN {TABLE_FOREIGN} ON {TABLE}.{INDEX_KEY} = {TABLE_FOREIGN}.{FOREIGN_PRIMARY_KEY}',
             QueryTemplate::Update->name => null,
             QueryTemplate::Insert->name => null,
             QueryTemplate::Delete->name => null,

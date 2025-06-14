@@ -2,8 +2,10 @@
 
 namespace DisciteDB\QueryHandler;
 
+use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Core\QueryManager;
 use DisciteDB\Methods\QueryConditionExpression;
+use DisciteDB\Sql\Data\DataValue;
 
 class QueryBuilder
 {
@@ -38,13 +40,13 @@ class QueryBuilder
         $this->query = $this->searchReplace($this->query,$this->associateUuid());
         $this->query = $this->searchReplace($this->query,['TABLE' => $this->queryHandler->returnStructure()['TABLE']]);
 
-        return $this->query;
+        return $this->query.$this->limitSearch();
     }
 
     private function associateTemplate() : void
     {
         $_array = [];
-
+        
         foreach($this->queryHandler->returnTemplate() as $i => $data)
         {
             if(is_null($data)) continue;
@@ -129,6 +131,7 @@ class QueryBuilder
 
     private function associateMethods(string &$template) : void
     {
+        
         if($this->queryHandler->returnMethods()['COUNT'] == 0) {$template = null; return;}
 
         $_array = [];
@@ -161,6 +164,13 @@ class QueryBuilder
         {
             return $haystack;
         }
+    }
+
+    private function limitSearch() : ?string
+    {
+        if($this->queryManager->getOperator() != Operators::Search) return '';
+
+        return 'LIMIT 35';
     }
 }
 
