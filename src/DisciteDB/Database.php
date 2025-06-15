@@ -78,6 +78,9 @@ class Database
      */
     protected ?array $sqlMap;
 
+
+    protected string|int|null $environment = null;
+
     /**
      * Database constructor.
      * 
@@ -287,6 +290,16 @@ class Database
     public function loadFromFile(string $path, int $updatingTime) : void
     {
         $this->sqlMap = (new HandlerFile($path, $updatingTime, $this->connection()->get(), $this))->getArray();
+    }
+
+    public function setEnvironment(string|int $environment) : void
+    {
+        $this->environment = $environment;
+    }
+
+    public function getEnvironment() : string|int|null
+    {
+        return $this->environment;
     }
 
 

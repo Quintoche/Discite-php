@@ -80,7 +80,7 @@ class QueryResult
     private function handleOtherResultData()
     {
         match ($this->queryManager->getOperator()) {
-            Operators::Create => $this->result->handleNewResult(mysqli_insert_id($this->queryManager->getConnection()) ?? null, $this->queryManager->getTable()),
+            // Operators::Create => $this->result->handleNewResult(mysqli_insert_id($this->queryManager->getConnection()) ?? null, $this->queryManager->getTable()),
             Operators::Update => $this->result->handleNewResult($this->queryManager->getUuid(), $this->queryManager->getTable()),
             default => null,
         };

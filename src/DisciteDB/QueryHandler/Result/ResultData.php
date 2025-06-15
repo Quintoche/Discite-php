@@ -125,6 +125,7 @@ class ResultData extends AbstractResult implements Result
     {
         $this->resultData = match ($this->queryManager->getOperator()) {
             Operators::Delete => ['deleted' => true],
+            Operators::Create => [$this->queryManager->getTable()->getPrimaryKey()->getAlias() => mysqli_insert_id($this->queryManager->getConnection())],
             default => [],
         };
     }

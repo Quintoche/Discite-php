@@ -55,8 +55,10 @@ class PonderationUtility
 
         // CASE 1
         $_keys = $this->foreignKeys[$this->table->getAlias()] ?? $this->foreignKeys[$this->table->getName()];
+        unset($_keys['_alias']);
 
         $_data = [];
+
 
         foreach($this->argument as $arg)
         {
@@ -81,10 +83,13 @@ class PonderationUtility
                 }
                 else
                 {
+                    
                     foreach($key as $table => $data)
                     {
                         foreach($data as $k => $v)
                         {
+                            if($k == '_alias') continue;
+                            if(is_array($v)) continue;
                             $_table = DataTable::escape($table);
                             $_key = DataKey::escape($v, $this->connection);
                             $_value = array_values($arg)[0]->returnValues()[0];

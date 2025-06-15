@@ -45,6 +45,7 @@ class ManageType
 
     private function checkString() : bool
     {
+        
         return (is_string($this->value));
     }
 
@@ -60,7 +61,7 @@ class ManageType
 
     private function checkInteger() : bool
     {
-        return is_int($this->value);
+        return filter_var($this->value, FILTER_VALIDATE_INT) || filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
     }
 
     private function checkBinary() : bool

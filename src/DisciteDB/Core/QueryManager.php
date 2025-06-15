@@ -68,6 +68,8 @@ class QueryManager
     }
     public function setArgs(mixed $args) : void
     {
+        if($this->database->getEnvironment()) $args['foreignEnvironment'] = $this->database->getEnvironment();
+
         $this->args = ClauseArgument::evaluateArguments($args, $this, $this->database) ?? [];
     }
     public function setUuid(?array $uuid = null) : void

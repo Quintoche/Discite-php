@@ -74,7 +74,6 @@ class HandlerArgument
                 $k = array_keys($v)[0];
                 $v = array_values($v)[0];
             }
-
             $_array_keys[] = $this->createArgsKeys($k);
             $_array_values[] = $this->createArgsValues($v);
             $_array_arguments[] = $this->createArgsArguments($k, $v);
@@ -93,7 +92,9 @@ class HandlerArgument
                 {
                     foreach($data as $k => $v)
                     {
-                        $_array_keys[] = DataTable::escape($name).'.'. $this->createArgsKeys($v);
+                        if($k == '_alias') continue;
+                        if(is_array($v)) continue;
+                        $_array_keys[] = DataTable::escape($name).'.'.$this->createArgsKeys($v);
                         $_array_values[] = $this->createArgsValues($_value);
                         $_array_arguments[] = str_replace('{TABLE}',DataTable::escape($name),$this->createArgsArguments($v, $_value));
                     }

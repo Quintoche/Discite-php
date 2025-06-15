@@ -5,8 +5,8 @@ namespace DisciteDB\Fields;
 use DisciteDB\Config\Enums\Operators;
 use DisciteDB\Keys\BaseKey;
 use DisciteDB\Methods\QueryConditionExpression;
-use DisciteDB\Methods\QueryExpression;
-use DisciteDB\Sql\Clause\ClauseArgument;
+use DisciteDB\Config\Enums\TypeDate;
+use DisciteDB\Config\Enums\TypeInteger;
 
 class FieldValidator
 {
@@ -41,7 +41,7 @@ class FieldValidator
 
     public function generateField() : mixed
     {
-        return ($this->value === null && !$this->key->getNullable()) ? (new ManageDefault($this->key))->returnDefault() : $this->value;
+        return ($this->value === null && !$this->key->getNullable()) ? (new ManageDefault($this->key))->returnDefault() : $this->formatValue($this->value);
     }
 
 
@@ -49,7 +49,7 @@ class FieldValidator
     {
         if($this->isLooseUsage()) return true;
         
-        $lookedValue = ($value instanceof QueryConditionExpression) ? $value->returnArgs() : $value;
+        $lookedValue = ($value instanceof QueryConditionExpression) ? $value->returnArgs() : $this->formatValue($value);
 
 
         if(is_array($lookedValue))
@@ -72,6 +72,33 @@ class FieldValidator
             !$this->validateFormat($lookedValue) => false,
             default => true,
         };
+    }
+
+    private function formatValue(mixed $value)
+    {
+        if(is_array($value)) return $value;
+
+        if($this->key->getType() instanceof TypeDate)
+        {
+            return match ($this->key->getType()) 
+            {
+                TypeDate::Date => date('Y-m-d',strtotime($value)),
+                TypeDate::DateTime, TypeDate::Timestamp => date('Y-m-d H:i:s',strtotime($value)),
+                TypeDate::Time => date('H:i:s',strtotime($value)),
+                TypeDate::Year => date('Y',strtotime($value)),
+                default => $value,
+            };
+        }
+        elseif($this->key->getType() instanceof TypeInteger)
+        {
+            return match ($this->key->getType()) 
+            {
+                TypeInteger::Boolean => ($value == 'true' || $value == true || $value == 1) ? true : false,
+                TypeInteger::BigInt => $value,
+                default => $value,
+            };
+        }
+        return $value;
     }
 
 

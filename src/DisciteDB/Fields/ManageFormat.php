@@ -62,8 +62,6 @@ class ManageFormat
             TypeDate::Year => (bool) preg_match('/^\d{4}$/', $this->value),
             default => false
         };
-
-        
     }
 
     private function checkBinary() : bool

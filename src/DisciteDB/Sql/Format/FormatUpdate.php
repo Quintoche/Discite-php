@@ -3,6 +3,7 @@
 namespace DisciteDB\Sql\Format;
 
 use DisciteDB\Config\Enums\Operators;
+use DisciteDB\Core\QueryManager;
 use DisciteDB\Database;
 use DisciteDB\Sql\Clause\ClauseArgument;
 
@@ -21,11 +22,11 @@ class FormatUpdate
         $this->database = $database;
     }
 
-    public function argumentsFormater() : ?array
+    public function argumentsFormater(QueryManager $query) : ?array
     {
         if($this->argsLooseUsage()) return $this->args;
 
-        return $this->argsLoop();
+        return $this->argsLoop($query);
     }
 
 
@@ -33,25 +34,33 @@ class FormatUpdate
 
 
 
-    private function argsLoop() : ?array
+    private function argsLoop(QueryManager $query) : ?array
     {
         $_array = [];
+        $columns = [];
+
+        foreach($query->getTable()->getMap() as $key)
+        {
+            $columns[] = $key->getAlias();
+        }
 
         foreach($this->args as $k => $v)
         {
+            if(!in_array($k,$columns)) continue;
+
             if($this->argsInstanceCheck($v)) 
             {
                 $_array[$k] = $v;
                 continue;
             }
             
-            if(!$this->argsValidArgumentCheck($k, $v))
+            if(!$this->argsValidArgumentCheck($query->getTable()->getName().'_'.$k, $v))
             {
                 $this->arrayUnset($k); 
                 continue;
             }
 
-            $_array[$k] = $this->argsValidArgumentGenerator($k);
+            $_array[$k] = $this->argsValidArgumentGenerator($query->getTable()->getName().'_'.$k);
         }
 
         return $_array;

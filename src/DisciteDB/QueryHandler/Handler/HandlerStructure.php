@@ -63,63 +63,62 @@ class HandlerStructure
         return implode(', ',$this->buildSqlColumns($this->definedColumn,'',0));
     }
 
-    function buildSqlColumns(array $structure, string $prefix = '', int $depth = 0): array 
-    {
-        $columns = [];
-    
-        foreach ($structure as $table => $fields) 
-        {
-            $simpleColumns = [];
-            $nestedTables = [];
-    
-            foreach ($fields as $field) 
-            {
-                if (is_array($field)) 
-                {
-                    $nestedTables[] = $field;
-                } else 
-                {
-                    $simpleColumns[] = $field;
-                }
-            }
-    
-            if ($depth === 0) 
-            {
-                foreach ($simpleColumns as $col) {
-                    $columns[] = "`$table`.`$col` AS '$col'";
-                }
-            }
-    
-            if ($depth >= 1) 
-            {
-                $jsonParts = [];
-                foreach ($simpleColumns as $col) 
-                {
-                    $jsonParts[] = "'$col', `$table`.`$col`";
-                }
-    
-                foreach ($nestedTables as $subTable) 
-                {
-                    $sub = $this->buildSqlColumns($subTable, $prefix, $depth + 1);
-                    foreach ($sub as $item) 
-                    {
-                        $jsonParts[] = "'".explode(' AS ', $item)[1]."', ".explode(' AS ', $item)[0];
-                    }
-                }
-    
-                $columns[] = "JSON_OBJECT(" . implode(', ', $jsonParts) . ") AS {$table}";
-            }
-    
-            foreach ($nestedTables as $subTable) 
-            {
-                $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
+    private function buildSqlColumns(array $structure, string $prefix = '', int $depth = 0): array
+{
+    $columns = [];
+
+    foreach ($structure as $table => $fields) {
+        if (!is_array($fields)) continue;
+
+        $alias = $fields['_alias'] ?? $table;
+        unset($fields['_alias']);
+
+        $simpleColumns = [];
+        $nestedTables = [];
+
+        foreach ($fields as $field) {
+            if (is_array($field)) {
+                $nestedTables[] = $field;
+            } else {
+                $simpleColumns[] = $field;
             }
         }
 
-        if(empty($columns)) $columns[] = '*';
-    
-        return $columns;
+        // Niveau racine : colonnes individuelles avec alias
+        if ($depth === 0) {
+            foreach ($simpleColumns as $col) {
+                $columns[] = "`$alias`.`$col` AS '$col'";
+            }
+        }
+
+        // Niveaux imbriqués : JSON_OBJECT
+        if ($depth >= 1) {
+            $jsonParts = [];
+            foreach ($simpleColumns as $col) {
+                $jsonParts[] = "'$col', `$alias`.`$col`";
+            }
+
+            foreach ($nestedTables as $subTable) {
+                $sub = $this->buildSqlColumns($subTable, $prefix, $depth + 1);
+                foreach ($sub as $item) {
+                    [$expression, $as] = explode(' AS ', $item, 2);
+                    $jsonParts[] = "'$as', $expression";
+                }
+            }
+
+            $columns[] = "JSON_OBJECT(" . implode(', ', $jsonParts) . ") AS $alias";
+        }
+
+        // Descente récursive pour les sous-tables
+        foreach ($nestedTables as $subTable) {
+            $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
+        }
     }
+
+    if (empty($columns)) $columns[] = '*';
+    return $columns;
+}
+
     
 
     private function getStructureColumns() : string

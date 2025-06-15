@@ -22,6 +22,8 @@ class HandlerMethods
 
     protected ?array $foreignTable = [];
 
+    protected ?array $foreignAlias = [];
+
     protected ?array $foreignKey;
 
     protected ?array $currentTable;
@@ -69,45 +71,64 @@ class HandlerMethods
         return ClauseTable::getIndexKey($table,$this->queryManager->getInstance());
     }
 
-    private function getForeign(array $indexKeys, BaseTable $table) : array
-    {
-        $_array = [];
-        $_array[$table->getAlias() ?? $table->getName()] = [];
+    private function getForeign(array $indexKeys, BaseTable $table, array $visited = [], string $path = ''): array
+{
+    $result = [];
+    $tableKey = $table->getAlias() ?? $table->getName();
 
-        foreach($table->getMap() as $keys)
-        {
-            if($keys->getIndex() == IndexType::Index) continue;
-            $_array[$table->getAlias() ?? $table->getName()][] = $keys->getAlias();
-        }
-            
-        foreach($indexKeys as $i => $key)
-        {
-            if(!$key->getIndexTable()) {$this->removeIndexKey($i); continue;}
+    $hash = $path . '/' . $tableKey;
+    if (in_array($hash, $visited)) return [];
 
-            $_foreignTable = $key->getIndexTable();
-            $_foreignKey = $_foreignTable->getPrimaryKey() ?? null;
+    $visited[] = $hash;
+    $result[$tableKey] = [];
 
-            if(!$_foreignKey){ $this->removeIndexKey($i); continue;}
-            
-            $foreignTable = $_foreignTable->getAlias() ?? $_foreignTable->getName();
-
-            
-            $this->foreignKey[] = $this->escapeKey($_foreignKey->getAlias()) ?? $this->escapeKey($_foreignKey->getName());
-            
-            
-            $this->currentTable[] = $this->escapeTable($table->getAlias()) ?? $this->escapeTable($table->getName());
-            $this->currentKey[] = $this->escapeKey($key->getAlias()) ?? $this->escapeKey($key->getName());
-
-            if(in_array($foreignTable,$this->foreignTable)) continue;
-            $this->foreignTable[] = $this->escapeTable($_foreignTable->getAlias()) ?? $this->escapeTable($_foreignTable->getName());
-
-            if(!$this->tableHasIndexKey($_foreignTable)) continue;
-
-            $_array[$table->getAlias() ?? $table->getName()][] = $this->getForeign($this->getIndexKey($_foreignTable),$_foreignTable);
-        }
-
-        return $_array;
+    foreach ($table->getMap() as $key) {
+        if ($key->getIndex() === IndexType::Index) continue;
+        $result[$tableKey][] = $key->getAlias();
     }
+
+    foreach ($indexKeys as $key) {
+        $foreignTable = $key->getIndexTable();
+        if (!$foreignTable) continue;
+
+        $foreignPrimary = $foreignTable->getPrimaryKey();
+        if (!$foreignPrimary) continue;
+
+        $foreignKeyName = $foreignPrimary->getAlias() ?? $foreignPrimary->getName();
+        $localKeyName = $key->getAlias() ?? $key->getName();
+        $localTable = $table->getAlias() ?? $table->getName();
+        $foreignBaseName = $foreignTable->getAlias() ?? $foreignTable->getName();
+
+        $this->foreignKey[]   = $this->escapeKey($foreignKeyName);
+        $this->currentKey[]   = $this->escapeKey($localKeyName);
+        $this->currentTable[] = $this->escapeTable($localTable);
+
+        $fullAlias = $foreignBaseName;
+        $count = 1;
+        while (in_array($this->escapeTable($fullAlias), $this->foreignAlias)) {
+            $count++;
+            $fullAlias = $foreignBaseName . '_' . $count;
+        }
+
+        $this->foreignAlias[] = $this->escapeTable($fullAlias);
+        $this->foreignTable[] = $this->escapeTable($foreignBaseName);
+
+        $nested = $this->getForeign(
+            $this->getIndexKey($foreignTable),
+            $foreignTable,
+            $visited,
+            $hash
+        );
+
+        if (!empty($nested)) {
+            $result[$tableKey][] = $nested;
+        }
+    }
+
+    return $result;
+}
+
+
     
     private function escapeKey(string $key) : string
     {
@@ -127,6 +148,7 @@ class HandlerMethods
             'TABLE' => $this->currentTable,
             'INDEX_KEY' => $this->currentKey,
             'TABLE_FOREIGN' => $this->foreignTable,
+            'TABLE_ALIAS' => $this->foreignAlias,
             'FOREIGN_PRIMARY_KEY' => $this->foreignKey
         ];
     }
