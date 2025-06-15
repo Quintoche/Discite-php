@@ -68,7 +68,16 @@ class QueryManager
     }
     public function setArgs(mixed $args) : void
     {
-        if($this->database->getEnvironment()) $args['foreignEnvironment'] = $this->database->getEnvironment();
+        if($this->database->getEnvironment())
+        {
+            $args['foreignEnvironment'] = $this->database->getEnvironment();
+
+            match(true)
+            {
+                $this->operator == Operators::CountAll => $this->operator = Operators::Count,
+                $this->operator == Operators::All => $this->operator = Operators::Listing,
+            };
+        }
 
         $this->args = ClauseArgument::evaluateArguments($args, $this, $this->database) ?? [];
     }

@@ -45,6 +45,8 @@ class HandlerTemplate
 
     private function selectTemplate() : QueryTemplate
     {
+
+        // $_tempSelector = (sizeof($this->queryManager->getArgs()) == 0) ? QueryTemplate::SelectAll : QueryTemplate::Select;
         return match ($this->queryManager->getOperator()) {
             Operators::All, Operators::CountAll => QueryTemplate::SelectAll,
             Operators::Compare => QueryTemplate::Select,
