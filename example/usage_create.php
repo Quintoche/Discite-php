@@ -32,9 +32,7 @@ error_reporting(E_ALL);
     $disciteDB->setEnvironment(1);
 
     // QUERY -- RETRIEVE
-    $queryFakeItems = $disciteDB->table('vehicle')->listing([
-        
-    ]);
+    $queryFakeItems = $disciteDB->table('userAccount')->retrieve(1);
     
 
     $end = microtime(true);

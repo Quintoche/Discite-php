@@ -82,8 +82,9 @@ class QueryBuilder
             if(is_null($data)) continue;
             $_array[] = $data;
         }
+        
 
-        return ['UUID'=>implode(' ',$_array)];
+        return ['UUID'=>($_array == [] ? '' : ' AND ').implode(' ',$_array)];
     }
 
     private function associateKeys() : array

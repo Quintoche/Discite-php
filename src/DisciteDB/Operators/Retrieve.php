@@ -16,13 +16,13 @@ trait Retrieve
         }
         else
         {
-            $uuidKey = $this->getPrimaryKey()->getName() ?? 'id';
+            $uuidKey = ($this->getPrimaryKey()->getAlias() ?? $this->getPrimaryKey()->getName()) ?? 'id';
             $uuidValue = $uuid;
         }
 
         
         $this->query->setOperator(Operators::Retrieve);
-        $this->query->setArgs([]);
+        $this->query->setArgs([$uuidKey => $uuidValue]);
         $this->query->setUuid([$uuidKey => $uuidValue]);
 
         return $this->query->makeQuery();

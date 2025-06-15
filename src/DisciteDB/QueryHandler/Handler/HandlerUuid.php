@@ -43,11 +43,20 @@ class HandlerUuid
 
         foreach($this->args as $k => $v)
         {
+            if(is_int($k) && is_array($v))
+            {
+                $k = array_keys($v)[0];
+                $v = array_values($v)[0];
+            }
+
+            var_dump($k);
+
             $_array_keys[] = $this->createArgsKeys($k);
             $_array_values[] = $this->createArgsValues($v);
             $_array_arguments[] = $this->createArgsArguments($k, $v);
         }
 
+        var_dump($_array_keys);
         $this->argumentKeys = $_array_keys;
         $this->argumentValues = $_array_values;
         $this->argumentArguments = $_array_arguments;
