@@ -62,6 +62,7 @@ error_reporting(E_ALL);
         'name'=>QueryCondition::Not('White Widget'),
         'description'=>QueryCondition::Contains('and',QueryLocation::Between),
         'price' => QueryCondition::LessOrEqual(25),
+        QueryModifier::Limit(1,1),
         // QueryMethod::Async($user),
     ]);
 

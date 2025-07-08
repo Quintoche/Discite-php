@@ -167,20 +167,50 @@ class ResultData extends AbstractResult implements Result
 
         $rows = mysqli_fetch_all($this->rawResult, MYSQLI_ASSOC);
 
-        return $this->decodeJsonFieldsRecursively($rows);
+        return $this->decodeJsonFieldsRecursively($this->formatArray($rows));
         
     }
 
+    private function formatArray(array $array): array
+    {
+        $newArray = [];
+
+        foreach ($array as $k => &$v) {
+            $cleanKey = str_contains($k, '$$_$_$$') ? explode('$$_$_$$', $k)[0] : $k;
+
+            if (is_array($v)) {
+                $v = $this->formatArray($v);
+            }
+
+            if (is_string($v)) {
+                while (str_contains($v, '$$_$_$$')) {
+                    $pos = strpos($v,'$$_$_$$');
+                    $len = 8;
+                    
+                    $v = substr_replace($v,'',$pos,$len);
+                }
+            }
+
+            $newArray[$cleanKey] = $v;
+        }
+
+        return $newArray;
+    }
+
+
     private function decodeJsonFieldsRecursively(array $rows) : array
     {
+
+        
+
         foreach ($rows as $key => &$row) {
             if(is_object($row) || is_array($row))
             {
-                foreach ($row as $key => $value) {
-                    if (is_string($value) && ValidateJson::isJson($value)) {
-                        $row[$key] = json_decode($value, true);
+                foreach ($row as $key => $values) {
+                    if (is_string($values) && ValidateJson::isJson($values)) {
+                        $row[$key] = json_decode($values, true);
         
-                        // Optional: decode sub-fields recursively too
+
                         if (is_array($row[$key])) {
                             $row[$key] = $this->decodeJsonFieldsRecursively([$row[$key]])[0];
                         }
@@ -192,7 +222,6 @@ class ResultData extends AbstractResult implements Result
                 if (is_string($row) && ValidateJson::isJson($row)) {
                     $row = json_decode($row, true);
     
-                    // Optional: decode sub-fields recursively too
                     if (is_array($row)) {
                         $row = $this->decodeJsonFieldsRecursively([$row])[0];
                     }
@@ -209,7 +238,7 @@ class ResultData extends AbstractResult implements Result
     {
         $rows = mysqli_fetch_assoc($this->rawResult);
 
-        return $this->decodeJsonFieldsRecursively($rows);
+        return $this->decodeJsonFieldsRecursively($this->formatArray($rows));
     }
 
     /**

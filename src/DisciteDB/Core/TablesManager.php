@@ -95,6 +95,11 @@ class TablesManager
         return $table;
     }
 
+    public function getMap() : array
+    {
+        return $this->map;
+    }
+
     private function callException($tableName)  : QueryResult
     {
         return (new QueryManager($this->database))->makeQuery(new ExceptionsManager("Table '$tableName' not found",404,'Database'));

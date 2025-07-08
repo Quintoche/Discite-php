@@ -15,7 +15,7 @@ error_reporting(E_ALL);
 
 
     // Create your connection
-    $_connection = new mysqli('localhost','root','','test_db');
+    $_connection = new mysqli('localhost','root','','disciteRemiseV2');
 
 
     // Initiate DisciteDB Manager
@@ -30,18 +30,16 @@ error_reporting(E_ALL);
 
     // To show how to make "SELECT" query, I've prefere to make loose usage for 
     // both table and keys.
-    $disciteDB->conf()->setTableUsage(DisciteDB::TABLE_USAGE_LOOSE);
-    $disciteDB->conf()->setKeyusage(DisciteDB::KEY_USAGE_LOOSE);
 
     $disciteDB->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
+    $disciteDB->loadFromDatabase();
+
+    $disciteDB->setEnvironment(1);
+
     // QUERY -- SELECT
-    $queryFakeItems = $disciteDB->table('disciteDB_FakeItems')->listing([
-        'name'=>QueryCondition::Not('White Widget'),
-        'description'=>QueryCondition::Contains('and',QueryLocation::Between),
-        'price' => QueryCondition::LessOrEqual(25),
-        QueryModifier::Order([DisciteDB::SORT_DESC,'name']),
-        QueryModifier::Limit(3,2),
+    $queryFakeItems = $disciteDB->table('vehicleBooking')->listing([
+        'foreignVehicle'=>7
     ]);
 
     // After that, you can show values :

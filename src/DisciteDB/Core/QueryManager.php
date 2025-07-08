@@ -76,6 +76,7 @@ class QueryManager
             {
                 $this->operator == Operators::CountAll => $this->operator = Operators::Count,
                 $this->operator == Operators::All => $this->operator = Operators::Listing,
+                default => null,
             };
         }
 

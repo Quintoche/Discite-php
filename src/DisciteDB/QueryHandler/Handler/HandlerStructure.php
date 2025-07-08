@@ -62,7 +62,7 @@ class HandlerStructure
     {
         return implode(', ',$this->buildSqlColumns($this->definedColumn,'',0));
     }
-
+    
     private function buildSqlColumns(array $structure, string $prefix = '', int $depth = 0): array
 {
     $columns = [];
@@ -71,6 +71,7 @@ class HandlerStructure
         if (!is_array($fields)) continue;
 
         $alias = $fields['_alias'] ?? $table;
+        
         unset($fields['_alias']);
 
         $simpleColumns = [];
@@ -83,15 +84,11 @@ class HandlerStructure
                 $simpleColumns[] = $field;
             }
         }
-
-        // Niveau racine : colonnes individuelles avec alias
         if ($depth === 0) {
             foreach ($simpleColumns as $col) {
                 $columns[] = "`$alias`.`$col` AS '$col'";
             }
         }
-
-        // Niveaux imbriqués : JSON_OBJECT
         if ($depth >= 1) {
             $jsonParts = [];
             foreach ($simpleColumns as $col) {
@@ -109,15 +106,20 @@ class HandlerStructure
             $columns[] = "JSON_OBJECT(" . implode(', ', $jsonParts) . ") AS $alias";
         }
 
-        // Descente récursive pour les sous-tables
         foreach ($nestedTables as $subTable) {
-            $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
+            if ($depth === 0) { 
+                $columns = array_merge($columns, $this->buildSqlColumns($subTable, $prefix, $depth + 1));
+            }
         }
     }
 
     if (empty($columns)) $columns[] = '*';
     return $columns;
 }
+    
+
+
+
 
     
 

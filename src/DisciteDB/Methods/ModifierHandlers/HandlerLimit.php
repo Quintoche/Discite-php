@@ -70,7 +70,7 @@ class HandlerLimit implements ArgumentHandlerInterface
         };
     }
 
-    private function formatUnique(string $escapedLimit, string $escapedOffset) : string
+    private function formatUnique(string $escapedLimit, ?string $escapedOffset) : string
     {
         return self::searchReplace($this->templateUnique, ['LIMIT'=>$escapedLimit, 'OFFSET'=>$escapedOffset]);
     }
@@ -89,6 +89,7 @@ class HandlerLimit implements ArgumentHandlerInterface
     {
         foreach($needle as $search => $replace)
         {
+            if($replace == null) $replace = '';
             $haystack = str_replace('{'.$search.'}',$replace,$haystack);
         }
         return $haystack;

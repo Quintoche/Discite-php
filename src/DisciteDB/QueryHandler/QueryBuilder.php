@@ -145,7 +145,6 @@ class QueryBuilder
             $_tableForeign = $this->queryHandler->returnMethods()['TABLE_FOREIGN'][$j];
             $_tableAlias = $this->queryHandler->returnMethods()['TABLE_ALIAS'][$j];
             $_foreignPrimaryKey = $this->queryHandler->returnMethods()['FOREIGN_PRIMARY_KEY'][$j];
-
             
             $_array[] = $this->searchReplace($_template,['TABLE'=>$_table,'INDEX_KEY'=>$_indexKey,'TABLE_FOREIGN'=>$_tableForeign,'TABLE_ALIAS'=>$_tableAlias,'FOREIGN_PRIMARY_KEY'=>$_foreignPrimaryKey]);
         }

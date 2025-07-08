@@ -30,18 +30,21 @@ class HandlerMethods
 
     protected ?array $currentKey;
 
+    private string $mainTable;
+
     protected ?array $multiArray = [];
     
     public function __construct(QueryManager $queryManager)
     {
         $this->queryManager = $queryManager;
 
+        $this->mainTable = $this->queryManager->getTable()->getName() ?? $this->queryManager->getTable()->getAlias();
+
         if(!$this->tableHasIndexKey($this->queryManager->getTable())) return;
 
         $this->indexKey = $this->getIndexKey($this->queryManager->getTable());
 
         $this->multiArray = $this->getForeign($this->indexKey, $this->queryManager->getTable());
-        
 
         $this->createArgs();
     }
@@ -71,7 +74,18 @@ class HandlerMethods
         return ClauseTable::getIndexKey($table,$this->queryManager->getInstance());
     }
 
-    private function getForeign(array $indexKeys, BaseTable $table, array $visited = [], string $path = ''): array
+    private function hasIndexKey(BaseTable $mainTable, array $indexedKeys = []) : bool
+    {
+        foreach($indexedKeys as $key)
+        {
+            if($key->getIndexTable()->getName() == $mainTable->getName()) return true;   
+        }
+
+        return false;
+    }
+
+
+    private function getForeign(array $indexKeys, BaseTable $table, array $visited = [], string $path = '', ?string $parentAlias = null): array
 {
     $result = [];
     $tableKey = $table->getAlias() ?? $table->getName();
@@ -101,13 +115,15 @@ class HandlerMethods
 
         $this->foreignKey[]   = $this->escapeKey($foreignKeyName);
         $this->currentKey[]   = $this->escapeKey($localKeyName);
-        $this->currentTable[] = $this->escapeTable($localTable);
+
+        $leftSideTable = $parentAlias ? $parentAlias : $localTable;
+        $this->currentTable[] = $this->escapeTable($leftSideTable);
 
         $fullAlias = $foreignBaseName;
         $count = 1;
         while (in_array($this->escapeTable($fullAlias), $this->foreignAlias)) {
             $count++;
-            $fullAlias = $foreignBaseName . '_' . $count;
+            $fullAlias = $foreignBaseName . '$$_$_$$' . $count;
         }
 
         $this->foreignAlias[] = $this->escapeTable($fullAlias);
@@ -117,10 +133,19 @@ class HandlerMethods
             $this->getIndexKey($foreignTable),
             $foreignTable,
             $visited,
-            $hash
+            $hash,
+        
+            $fullAlias 
         );
-
+        
         if (!empty($nested)) {
+            
+            $nestedTableKey = key($nested); 
+        
+            if (isset($nested[$nestedTableKey])) {
+                $nested[$nestedTableKey]['_alias'] = $fullAlias; // $fullAlias contient 'userPerson_2'
+            }
+    
             $result[$tableKey][] = $nested;
         }
     }
@@ -128,6 +153,43 @@ class HandlerMethods
     return $result;
 }
 
+
+
+
+
+
+private function generateAlias(string $base, string $via = '', int &$counter = 1): string
+{
+    $alias = $base;
+    if ($via !== '') {
+        $alias .= '_' . $via;
+    }
+    while (in_array($alias, $this->foreignAlias)) {
+        $alias = $base . '_' . $via . '_' . $counter;
+        $counter++;
+    }
+    $this->foreignAlias[] = $alias;
+    return $alias;
+}
+
+
+private function getForeigns()
+{
+    $_array = [];
+
+    $mainTable = $this->queryManager->getTable();
+    $mainTableName = $mainTable->getName();
+
+    foreach ($this->queryManager->getInstance()->tables()->getMap() as $table) {
+        if ($table->getName() === $mainTableName) continue;
+        if (!$this->hasIndexKey($mainTable, $this->getIndexKey($table))) continue;
+
+        $tableKey = $table->getAlias() ?? $table->getName();
+        $_array[$tableKey][] = $this->getForeign($this->getIndexKey($table), $table, [], '', $mainTableName);
+    }
+
+    return $_array;
+}
 
     
     private function escapeKey(string $key) : string

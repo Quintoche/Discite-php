@@ -48,7 +48,7 @@ class FormatAll
 
         foreach($this->args as $k => $v)
         {
-            if(!in_array($k,$columns)) continue;
+            if(!in_array($k,$columns) && !is_int($k)) continue;
 
             if($this->argsInstanceCheck($v)) 
             {

@@ -4,6 +4,7 @@ namespace DisciteDB\Core;
 use DisciteDB\Config\Traits\KeysManager\Create;
 use DisciteDB\Database;
 use DisciteDB\Keys\BaseKey;
+use DisciteDB\QueryHandler\QueryResult;
 use DisciteDB\Utilities\NameSanitizer;
 
 class KeysManager
@@ -80,12 +81,17 @@ class KeysManager
         return (class_exists('\\DisciteDB\\Keys\\KeyTemplates\\Template'.$className)) ? '\\DisciteDB\\Keys\\KeyTemplates\\Template'.$className : null;
     }
 
-    public function __get($name) : BaseKey
+    public function __get($name) : QueryResult|BaseKey
     {
         $key = $this->map[$name] ?? $this->map[NameSanitizer::sanitize($name)] ?? null;
-        if(!$key) throw new \Exception("Key '$name' not found");
+        if(!$key) return $this->callException($name);
 
         return $key;
+    }
+
+    private function callException($keyName)  : QueryResult
+    {
+        return (new QueryManager($this->database))->makeQuery(new ExceptionsManager("Key '$keyName' not found",404,'Database'));
     }
 
 }
