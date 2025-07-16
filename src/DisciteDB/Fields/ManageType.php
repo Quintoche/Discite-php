@@ -61,7 +61,7 @@ class ManageType
 
     private function checkInteger() : bool
     {
-        return filter_var($this->value, FILTER_VALIDATE_INT) || filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->value, FILTER_VALIDATE_INT) || filter_var($this->value, FILTER_VALIDATE_BOOLEAN) || $this->value == 0;
     }
 
     private function checkBinary() : bool

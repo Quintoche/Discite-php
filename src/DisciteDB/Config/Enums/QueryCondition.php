@@ -110,6 +110,23 @@ enum QueryCondition : int
      * LessorEqual.
     */
     case LessOrEqual = 9013;
+
+    public static function toForm($value)
+    {
+        foreach(self::cases() as $case)
+        {
+            if($value == $case->value)
+            {
+                switch($value)
+                {
+                    case 904 :
+                        return '!=';
+                    default :
+                        return '=';
+                }
+            }
+        }
+    }
     
 }
 ?>

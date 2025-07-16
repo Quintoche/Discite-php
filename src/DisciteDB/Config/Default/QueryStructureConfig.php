@@ -39,7 +39,7 @@ class QueryStructureConfig
             QueryTemplate::Delete->name => null,
         ],        
         QueryStructure::Conditions->name  => [
-            QueryTemplate::Select->name => 'WHERE {CONDITIONS} {UUID} {MODIFIER}',
+            QueryTemplate::Select->name => 'WHERE {CONDITIONS} {MODIFIER}',
             QueryTemplate::SelectAll->name => '{MODIFIER}',
             QueryTemplate::Update->name => 'WHERE {UUID}',
             QueryTemplate::Insert->name => null,

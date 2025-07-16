@@ -3,6 +3,7 @@
 namespace DisciteDB\Methods\ConditionHandlers;
 
 use DisciteDB\Config\Enums\QueryCondition;
+use DisciteDB\Methods\QueryConditionExpression;
 use DisciteDB\Sql\Data\DataKey;
 use DisciteDB\Sql\Data\DataValue;
 use mysqli;
@@ -56,6 +57,7 @@ abstract class AbstractBaseHandler
         $this->templateUnique = '{VALUE}';
         $this->value = $this->escapeValue();
         $this->parts = $this->formatStructure();
+        
 
         return $this->formatForm();
     }
@@ -97,7 +99,14 @@ abstract class AbstractBaseHandler
 
             foreach($this->value as $value)
             {
-                $_array[] = DataValue::escape($value,$this->connection);
+                if($value instanceof QueryConditionExpression)
+                {
+                    $_array[] = $value;
+                }
+                else
+                {
+                    $_array[] = DataValue::escape($value,$this->connection);
+                }
             }
 
             return $_array;
@@ -114,11 +123,25 @@ abstract class AbstractBaseHandler
 
             foreach($this->value as $value)
             {
-                $_array[] = $this->searchReplace($this->templateUnique,['KEY'=>$this->key,'VALUE'=>$value]);
+                if($value instanceof QueryConditionExpression)
+                {
+                    $_array[] = $value->returnCondition($this->key,$this->connection);
+                    continue;
+                }
+
+                if($value == 'NULL')
+                {
+                    $_array[] = $this->searchReplace('{TABLE}.{KEY} IS {VALUE}',['KEY'=>$this->key,'VALUE'=>$value]);
+                }
+                else
+                {
+                    $_array[] = $this->searchReplace($this->templateUnique,['KEY'=>$this->key,'VALUE'=>$value]);
+                }
             }
 
             return $_array;
         }
+        
         return [$this->searchReplace($this->templateUnique,['KEY'=>$this->key,'VALUE'=>$this->value])];
     }
 

@@ -33,30 +33,33 @@ error_reporting(E_ALL);
 
     $disciteDB->config()->setNamingConvention(DisciteDB::NAMING_CONVENTION_UNDEFINED);
 
-    $disciteDB->loadFromDatabase();
+    $disciteDB->loadFromFile(dirname(__DIR__, 2).'/discite-php/.files/sql.cache.json',0);
 
     $disciteDB->setEnvironment(1);
 
-    // QUERY -- SELECT
-    $queryFakeItems = $disciteDB->table('vehicleBooking')->listing([
-        'foreignVehicle'=>7
+    $queryFakeItems = $disciteDB->table('materialMovementData')->update(['id'=>1],[
+            'quantityGave'=>3,
     ]);
-    // ->table('vehicleMovementData_scope')->listing(['foreignCategory'=>$category['id'],'foreignCategoryPrincipal'=>QueryCondition::Or([null, $this->vehicle['vehicle_categoryPrincipal']['id']]),'foreignCategorySecondary'=>QueryCondition::Or([null, $this->vehicle['vehicle_categorySecondary']['id']])])->fetchArray()['data']
+
+    // QUERY -- SELECT
+    // $queryFakeItems = $disciteDB->table('vehicleMovementData_scope')->listing(['foreignCategory'=>7,'foreignCategoryPrincipal'=>QueryCondition::Or(null, 1),'foreignCategorySecondary'=>QueryCondition::Or(null, 1)]);
+    // $queryFakeItems = $disciteDB->table('vehicleControlData_scope')->listing(['foreignCategory'=>4,'foreignCategoryPrincipal'=>QueryCondition::Or(null, 1),'foreignCategorySecondary'=>QueryCondition::Or(null, 2),'foreignExceptPrimary'=>QueryCondition::Or(null,QueryCondition::Not(1)),'foreignExceptSecondary'=>QueryCondition::Or(null,QueryCondition::Not(2))]);
+    // $queryFakeItems = $disciteDB->table('vehicle')->update(['id'=>7],['mileage'=>10]);
 
     // After that, you can show values :
 
     // You will get only informations but no values
     echo '<br/><br/><br/><br/><b>QUERY</b>';
-    echo '<pre>',var_dump($queryFakeItems->fetchQuery()),'</pre>';
+    // echo '<pre>',var_dump($queryFakeItems->fetchQuery()),'</pre>';
 
 
     // You will get only informations but no values
     echo '<b>INFORMATIONS ONLY</b>';
-    echo '<pre>',var_dump($queryFakeItems->fetchInformations()),'</pre>';
+    // echo '<pre>',var_dump($queryFakeItems->fetchInformations()),'</pre>';
     
     // You will have the next data
     echo '<b>NEXT DATA</b>';
-    echo '<pre>',var_dump($queryFakeItems->fetchNext()),'</pre>';
+    // echo '<pre>',var_dump($queryFakeItems->fetchNext()),'</pre>';
     
     // You will have all data
     echo '<b>ALL DATA</b>';
@@ -64,6 +67,6 @@ error_reporting(E_ALL);
     
     // You will have all data and infos
     echo '<b>ALL DATA AND INFORMATIONS</b>';
-    echo '<pre>',var_dump($queryFakeItems->fetchArray()),'</pre>';
+    // echo '<pre>',var_dump($queryFakeItems->fetchArray()),'</pre>';
     
 ?>

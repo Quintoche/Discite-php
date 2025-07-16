@@ -60,6 +60,7 @@ class QueryBuilder
 
     private function associateArgs() : array
     {
+
         if(!$this->queryHandler->returnArguments()['CONDITIONS']) return ['CONDITIONS'=>''];
         
         $_array = [];
@@ -83,8 +84,7 @@ class QueryBuilder
             $_array[] = $data;
         }
         
-
-        return ['UUID'=>($_array == [] ? '' : ' AND ').implode(' ',$_array)];
+        return ['UUID'=>(count($_array) == 1 ? '' : ' AND ').implode(' ',$_array)];
     }
 
     private function associateKeys() : array
@@ -121,11 +121,20 @@ class QueryBuilder
         if(!$this->queryHandler->returnModifier()['MODIFIER']) return ['MODIFIER'=>''];
         
         $_array = [];
+
+        $i = 0;
+        $j = 10;
+
         foreach($this->queryHandler->returnModifier()['MODIFIER'] as $data)
         {
             if(is_null($data)) continue;
-            $_array[] = $data;
+
+            $v = (str_contains($data,'LIMIT')) ? $j++ : $i++; 
+
+            $_array[$v] = $data;
         }
+
+        ksort($_array);
 
         return ['MODIFIER'=>implode(' ',$_array)];
     }

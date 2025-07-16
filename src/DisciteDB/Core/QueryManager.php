@@ -68,7 +68,13 @@ class QueryManager
     }
     public function setArgs(mixed $args) : void
     {
-        if($this->database->getEnvironment())
+        $_need = false;
+        foreach($this->table->getMap() as $key)
+        {
+            if($key->getIndexTable()?->getName() == 'environment') $_need = true;
+        }
+
+        if($this->database->getEnvironment() && $_need)
         {
             $args['foreignEnvironment'] = $this->database->getEnvironment();
 
@@ -79,6 +85,7 @@ class QueryManager
                 default => null,
             };
         }
+        
 
         $this->args = ClauseArgument::evaluateArguments($args, $this, $this->database) ?? [];
     }

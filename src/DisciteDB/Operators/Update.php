@@ -8,26 +8,7 @@ use DisciteDB\QueryHandler\QueryResult;
 trait Update
 {
     public function update(string|int|array $uuid, array $args) : QueryResult
-    {
-        foreach($args as $argKey => $argValue)
-        {
-            $key = $this->returnKey($argKey);
-            
-            if(is_null($key))
-            {
-                unset($args[$argKey]);
-                continue;
-            }
-
-            if(!$key->validateField(Operators::Update,$argValue))
-            {
-                unset($args[$argKey]);
-                continue;
-            }
-            
-            $args[$argKey] = $key->generateField();
-        }
-    
+    {    
         if(is_array($uuid))
         {
             $uuidKey = array_keys($uuid)[0];
@@ -43,7 +24,7 @@ trait Update
         $this->query->setOperator(Operators::Update);
         $this->query->setArgs($args);
         $this->query->setUuid([$uuidKey => $uuidValue]);
-
+    
         return $this->query->makeQuery();
     }
 }
